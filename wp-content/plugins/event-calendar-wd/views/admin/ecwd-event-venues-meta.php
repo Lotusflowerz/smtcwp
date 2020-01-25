@@ -2,12 +2,12 @@
 
 global $post, $ecwd_options;
 $post_id = $post->ID;
+$single_event = $this->single_event_for_metas;
 
-$ecwd_event_venue = get_post_meta($post->ID, ECWD_PLUGIN_PREFIX . '_event_venue', true);
-$ecwd_event_location = get_post_meta($post->ID, ECWD_PLUGIN_PREFIX . '_event_location', true);
-$ecwd_event_show_map = get_post_meta($post->ID, ECWD_PLUGIN_PREFIX . '_event_show_map', true);
-$ecwd_map_zoom = get_post_meta($post->ID, ECWD_PLUGIN_PREFIX . '_map_zoom', true);
-$ecwd_lat_long = get_post_meta($post->ID, ECWD_PLUGIN_PREFIX . '_lat_long', true);
+$ecwd_event_venue = ($single_event->venue !== null) ? $single_event->venue['post']->ID : "";
+$ecwd_event_location = ($single_event->venue !== null) ? $single_event->venue['metas']['location'] : "";
+$ecwd_event_show_map = ($single_event->venue !== null) ? $single_event->venue['metas']['show_map'] : "";
+$ecwd_lat_long = ($single_event->venue !== null) ? $single_event->venue['metas']['lat_long'] : "";
 
 $long = '';
 $lat = '';
@@ -38,12 +38,13 @@ $venues_meta_data = array();
 $venues = get_posts($args);
 $selected_venue_metadata = null;
 
+$ecwd_map_zoom = "";
 if (!empty($venues)) {
 
   foreach ($venues as $venue) {
     $venues_meta_data[$venue->ID] = array();
 
-    $venues_meta_data[$venue->ID]['post_title'] = $venue->post_title;
+    $venues_meta_data[$venue->ID]['post_title'] = esc_html($venue->post_title);
 
     foreach ($venue_meta_keys as $venue_meta_key) {
       $venues_meta_data[$venue->ID][$venue_meta_key] = get_post_meta($venue->ID, $venue_meta_key, true);
@@ -55,6 +56,7 @@ if (!empty($venues)) {
       $selected_venue_metadata = $venues_meta_data[$ecwd_event_venue];
       $has_selected_venue = true;
       $venue_meta_show_map = $venues_meta_data[$ecwd_event_venue]['ecwd_venue_show_map'];
+      $ecwd_map_zoom = get_post_meta($venue->ID, 'ecwd_map_zoom', true);
     }
 
   }
@@ -70,17 +72,17 @@ $map_table_class = "ecwd_event_venue_map_content";
 ?>
 <table class="form-table">
   <tr>
-    <th scope="row"><?php _e('Event Venue', 'ecwd'); ?>:</th>
+    <th scope="row"><?php _e('Event Venue', 'event-calendar-wd'); ?>:</th>
     <td>
       <select name="ecwd_event_venue" id="ecwd_event_venue">
-        <option value="0">None</option>
-        <option value="new">Create New</option>
+        <option value="0"><?php _e('None','event-calendar-wd');?></option>
+        <option value="new"><?php _e('Create New','event-calendar-wd');?></option>
         <optgroup label="Choose venue">
           <?php
           if (!empty($venues)) { ?>
             <?php foreach ($venues as $venue) { ?>
               <option value="<?php echo $venue->ID; ?>" <?php echo selected($venue->ID, $ecwd_event_venue); ?>>
-                <?php echo $venue->post_title; ?>
+                <?php echo esc_html($venue->post_title); ?>
               </option>
               <?php
             } ?>
@@ -89,26 +91,26 @@ $map_table_class = "ecwd_event_venue_map_content";
           ?>
         </optgroup>
       </select>
-      <p class="description"><?php _e('Select the venue of the event.', 'ecwd'); ?></p>
+      <p class="description"><?php _e('Select the venue of the event.', 'event-calendar-wd'); ?></p>
     </td>
   </tr>
   <tbody class="<?php echo $info_table_class; ?>">
   <tr class="ecwd_venue_info_field">
-    <th><?php _e('Address:', 'ecwd'); ?></th>
+    <th><?php _e('Address:', 'event-calendar-wd'); ?></th>
     <td class="ecwd_venue_address_info">
-      <?php echo (isset($selected_venue_metadata['ecwd_venue_location'])) ? $selected_venue_metadata['ecwd_venue_location'] : ""; ?>
+      <?php echo (isset($selected_venue_metadata['ecwd_venue_location'])) ? esc_html($selected_venue_metadata['ecwd_venue_location']) : ""; ?>
     </td>
   </tr>
   <tr class="ecwd_venue_info_field">
-    <th><?php _e('Phone:', 'ecwd'); ?></th>
+    <th><?php _e('Phone:', 'event-calendar-wd'); ?></th>
     <td class="ecwd_venue_phone_info">
-      <?php echo (isset($selected_venue_metadata['ecwd_venue_meta_phone'])) ? $selected_venue_metadata['ecwd_venue_meta_phone'] : ""; ?>
+      <?php echo (isset($selected_venue_metadata['ecwd_venue_meta_phone'])) ? esc_html($selected_venue_metadata['ecwd_venue_meta_phone']) : ""; ?>
     </td>
   </tr>
   <tr class="ecwd_venue_info_field">
-    <th><?php _e('Website:', 'ecwd'); ?></th>
+    <th><?php _e('Website:', 'event-calendar-wd'); ?></th>
     <td class="ecwd_venue_website_info">
-      <?php echo (isset($selected_venue_metadata['ecwd_venue_meta_website'])) ? $selected_venue_metadata['ecwd_venue_meta_website'] : ""; ?>
+      <?php echo (isset($selected_venue_metadata['ecwd_venue_meta_website'])) ? esc_html($selected_venue_metadata['ecwd_venue_meta_website']) : ""; ?>
     </td>
   </tr>
   </tbody>
@@ -120,19 +122,19 @@ $map_table_class = "ecwd_event_venue_map_content";
     </td>
   </tr>
   <tr class="ecwd_venue_form_field">
-    <th>Description:</th>
+    <th><?php _e('Description','event-calendar-wd');?>:</th>
     <td class="ecwd_venue_phone_field">
       <textarea class="ecwd_event_venue_content_field"></textarea>
     </td>
   </tr>
   <tr class="ecwd_venue_form_field">
-    <th>Phone:</th>
+    <th><?php _e('Phone','event-calendar-wd')?>:</th>
     <td class="ecwd_venue_phone_field">
       <input type="text" class="ecwd_event_venue_phone_field"/>
     </td>
   </tr>
   <tr class="ecwd_venue_form_field">
-    <th>Website:</th>
+    <th><?php _e('Website','event-calendar-wd')?>:</th>
     <td class="ecwd_venue_phone_field">
       <input type="text" class="ecwd_event_venue_website_field"/>
     </td>
@@ -152,7 +154,7 @@ $map_table_class = "ecwd_event_venue_map_content";
 
   ?>
   <tr>
-    <th class="<?php echo $map_td_th_class; ?>">Address:</th>
+    <th class="<?php echo $map_td_th_class; ?>"><?php _e('Address','event-calendar-wd')?>:</th>
     <td class="<?php echo $map_td_th_class; ?>">
       <!-- start ecwd_event_location -->
       <div class="ecwd-meta-field">
@@ -164,7 +166,7 @@ $map_table_class = "ecwd_event_venue_map_content";
     </td>
   </tr>
   <tr>
-    <th class="<?php echo $map_td_th_class; ?>">Show Google Map:</th>
+    <th class="<?php echo $map_td_th_class; ?>"><?php _e('Show Google Map','event-calendar-wd')?>:</th>
     <td class="<?php echo $map_td_th_class; ?>">
 
       <?php
@@ -223,12 +225,12 @@ $map_table_class = "ecwd_event_venue_map_content";
             ?>
             <input type="hidden" name="<?php echo ECWD_PLUGIN_PREFIX; ?>_lat_long"
                    id="<?php echo ECWD_PLUGIN_PREFIX; ?>_lat_long"
-                   value="<?php echo $ecwd_lat_long; ?>"/>
+                   value="<?php echo esc_attr($ecwd_lat_long); ?>"/>
             <input type="hidden" name="<?php echo ECWD_PLUGIN_PREFIX; ?>_marker"
-                   id="<?php echo ECWD_PLUGIN_PREFIX; ?>_marker" value="<?php echo $ecwd_marker; ?>"/>
+                   id="<?php echo ECWD_PLUGIN_PREFIX; ?>_marker" value="<?php echo esc_attr($ecwd_marker); ?>"/>
             <input type="hidden" name="<?php echo ECWD_PLUGIN_PREFIX; ?>_map_zoom"
                    id="<?php echo ECWD_PLUGIN_PREFIX; ?>_map_zoom"
-                   value="<?php echo $ecwd_map_zoom; ?>"/>
+                   value="<?php echo esc_attr($ecwd_map_zoom); ?>"/>
             <div id="map-canvas" style="width: 100%; height: 300px; min-height: 300px;"></div>
             <?php
             $latitude = $longitude = '';
@@ -247,21 +249,21 @@ $map_table_class = "ecwd_event_venue_map_content";
             ?>
             <div class="<?php echo $lat_long_container_class; ?>">
               <label style="width:85px;display:inline-block;" for="ecwd_latitude">Latitude:</label>
-              <input type="text" id="ecwd_latitude" value="<?php echo $latitude; ?>"/>
+              <input type="text" id="ecwd_latitude" value="<?php echo esc_attr($latitude); ?>"/>
               <br/>
               <label style="width:85px;display:inline-block;" for="ecwd_longitude">Longitude:</label>
-              <input type="text" id="ecwd_longitude" value="<?php echo $longitude; ?>"/>
+              <input type="text" id="ecwd_longitude" value="<?php echo esc_attr($longitude); ?>"/>
             </div>
           </div>
         </div>
         <p class="<?php echo $venue_description_class; ?>">
-          <?php _e('If venue is not specified you can fill in the address of the event location or click on the map to drag and drop the marker to the event location.', 'ecwd'); ?>
+          <?php _e('If venue is not specified you can fill in the address of the event location or click on the map to drag and drop the marker to the event location.', 'event-calendar-wd'); ?>
         </p>
       <?php } else { ?>
         <label></label>
         <span class="<?php echo $venue_description_class; ?>">
-               <?php _e('You need Google Maps API key to display maps.', 'ecwd'); ?>
-          <a href="edit.php?post_type=ecwd_event&page=ecwd_general_settings&tab=google_map">Get a key</a>
+               <?php _e('You need Google Maps API key to display maps.', 'event-calendar-wd'); ?>
+          <a href="edit.php?post_type=ecwd_event&page=ecwd_general_settings&tab=google_map"><?php _e('Get a key','event-calendar-wd')?></a>
             </span>
       <?php } ?>
     </td>
@@ -278,13 +280,13 @@ $map_table_class = "ecwd_event_venue_map_content";
     <th>
       <a class="button ecwd_edit_venue_link"
          href="<?php echo (isset($selected_venue_metadata['edit_link'])) ? $selected_venue_metadata['edit_link'] : '#' ?>"
-         target="_blank"><?php _e('Edit Venue', 'ecwd'); ?></a>
+         target="_blank"><?php _e('Edit Venue', 'event-calendar-wd'); ?></a>
     </th>
   </tr>
   </tfoot>
   <tfoot class="<?php echo $add_button_class; ?>">
   <th>
-    <button class="button button-primary button-large ecwd-add-venue-save">Save Venue</button>
+    <button class="button button-primary button-large ecwd-add-venue-save"><?php _e('Save Venue','event-calendar-wd')?></button>
     <span class="spinner"></span>
   </th>
   </tfoot>

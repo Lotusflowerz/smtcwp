@@ -1,5 +1,15 @@
 (function ($) {
-
+    var ecwd_format = "Y/m/d H:i";
+    var ecwd_formatTime = "H:i";
+    if(typeof ecwd.time_picker_format !== undefined){
+        if(ecwd.time_picker_format === "a"){
+            ecwd_format = "Y/m/d g:i a";
+            ecwd_formatTime = "g:i a";
+        }else if(ecwd.time_picker_format === "A"){
+            ecwd_format = "Y/m/d g:i A";
+            ecwd_formatTime = "g:i A";
+        }
+    }
     $('#ecwd_event_repeat_until_input, #ecwd_date_from_filter, #ecwd_date_to_filter').datetimepicker({
         scrollMonth: false,
         scrollInput: false,
@@ -34,7 +44,8 @@
         } else {
             $('#ecwd_event_date_from, #ecwd_event_date_to').datetimepicker({
                 timepicker:true,
-                format:'Y/m/d H:i',
+                format: ecwd_format,
+                formatTime: ecwd_formatTime,
                 scrollInput: false,
                 closeOnDateSelect:false
             });

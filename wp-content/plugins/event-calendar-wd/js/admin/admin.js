@@ -4,6 +4,24 @@
 (function ($)
 {
 
+  $("input[name='ecwd_set_default']").on('change',function(){
+    var ecwd_calendar_id = $(this).data("calendar_id");
+    console.log(ecwd_calendar_id);
+    jQuery.ajax({
+      type: 'POST',
+      url: ecwd.ajaxurl,
+      data: {
+        action: 'ecwd_set_default_calendar',
+        nonce: ecwd.ajaxnonce,
+        id: ecwd_calendar_id
+      },
+      success: function (response) {
+
+      }
+    });
+  });
+
+
   $("#ecwd_category_color").ecolorpicker();
 
   $('#ecwd_event_repeat_dont_repeat_radio').click(function ()
@@ -97,8 +115,8 @@
   if ($("#ecwd_event_meta").length > 0) {
     $("#post").submit(function (e)
     {
-      var dateTo = Date.parse($("#ecwd_event_date_to").val()),
-        dateFrom = Date.parse($("#ecwd_event_date_from").val());
+      var dateTo = Date.parse($("#ecwd_event_date_to").val().replace("am", " am").replace("pm", " pm").replace("AM", " AM").replace("PM", " PM")),
+        dateFrom = Date.parse($("#ecwd_event_date_from").val().replace("am", " am").replace("pm", " pm").replace("AM", " AM").replace("PM", " PM"));
       if (dateFrom == '' || isNaN(dateFrom) || isNaN(dateTo) || dateTo == '') {
         alert('Please set the event dates');
         e.preventDefault();
@@ -234,6 +252,20 @@
       {
         res = JSON.parse(data);
         if (res.status == 'ok') {
+          if($(".ecwd_events_popup_button").length === 0){
+            var data_new_event_url = $(clicked_el).closest(".ecwd-events").data("new_event_url");
+            $(".ecwd_events_popup_button").remove();
+            $(".ecwd-calendar-event-add").html('<a class="ecwd_events_popup_button" data-new_event_url="'+data_new_event_url+'" href="#ecwd_event_list_popup">Select Events from the list</a><a class="ecwd_events_popup_button" data-new_event_url="\'+data_new_event_url+\'" href="#ecwd_event_list_popup"><span class="add_event_plus">+</span></a>');
+            var ecwd_events_popup_button = $('.ecwd_events_popup_button');
+            if(ecwd_events_popup_button.length>0){
+              ecwd_events_popup_button.magnificPopup({
+                type:'inline',
+                callbacks: {
+
+                }
+              });
+            }
+          }
           $(clicked_el).removeClass('ecwd-calendar-event-delete');
           $(clicked_el).addClass('ecwd-calendar-event-add');
           $(clicked_el).text('+');
@@ -353,12 +385,12 @@
         res = JSON.parse(data);
         if (res.status == 'success') {
           $('#add_event_to_cal').hide();
-          $('.ecwd_notification').html('Event \'' + name + '\' has been saved as draft.  <a href="?post=' + res.data.event_id + '&action=edit">Edit details</a>');
+          $('.ecwd_notification').html('Event \'' + name + '\' has been saved.  <a href="?post=' + res.data.event_id + '&action=edit" target="_blank">Edit details</a>');
         }
       });
     } else {
       $('#ecwd_event_name').focus();
-      $('.ecwd_error').html('Enter event name');
+      $('.ecwd_error').html(ecwd_admin_translation.enter_event_name);
     }
   });
   //////////////////////////////////////////
@@ -391,14 +423,14 @@
   });
 
 
-  $('.ecwd_add_event_to_calendar').ecwd_popup({
+/*  $('.ecwd_add_event_to_calendar').ecwd_popup({
     button: $('.ecwd_events_popup_button'),
-    title: 'Event List',
+    title: ecwd_admin_translation.event_list,
     container_class: 'ecwd_add_event_calendar'
-  });
+  });*/
   $('#ecwd_preview_add_event_popup').ecwd_popup({
     button: $('#ecwd_preview_add_event'),
-    title: 'Calendar',
+    title: ecwd_admin_translation.calendar,
     body_class: "ecwd-modal",
     container_class: 'ecwd_preview_calendar'
   });
@@ -647,9 +679,9 @@
 
       var venue = ecwd_venues[venueID];
 
-      this.$infoTable.find('.ecwd_venue_address_info').text((venue.ecwd_venue_location != "") ? venue.ecwd_venue_location : "None");
-      this.$infoTable.find('.ecwd_venue_phone_info').text((venue.ecwd_venue_meta_phone != "") ? venue.ecwd_venue_meta_phone : "None");
-      this.$infoTable.find('.ecwd_venue_website_info').text((venue.ecwd_venue_meta_website != "") ? venue.ecwd_venue_meta_website : "None");
+      this.$infoTable.find('.ecwd_venue_address_info').text((venue.ecwd_venue_location != "") ? venue.ecwd_venue_location : ecwd_admin_translation.none);
+      this.$infoTable.find('.ecwd_venue_phone_info').text((venue.ecwd_venue_meta_phone != "") ? venue.ecwd_venue_meta_phone : ecwd_admin_translation.none);
+      this.$infoTable.find('.ecwd_venue_website_info').text((venue.ecwd_venue_meta_website != "") ? venue.ecwd_venue_meta_website : ecwd_admin_translation.none);
       this.$editVenueButtonContainer.find('.ecwd_edit_venue_link').attr('href', venue.edit_link);
 
       this.$location.addClass('ecwd_hidden');
@@ -846,6 +878,15 @@
 
     return response;
   }
+
+    jQuery('#ecwd_reset_settings_button').on('click', function (e) {
+        e.preventDefault();
+
+        jQuery('#ecwd_reset_settings_form').submit();
+
+        return false;
+    });
+
 
 }(jQuery));
 
@@ -1129,3 +1170,346 @@ function loadScript()
     '&callback=initialize&libraries=places&key=' + ecwd.gmap_key;
   document.body.appendChild(script);
 }
+
+
+var ecwd_table;
+var ecwd_past_events_table;
+
+
+jQuery(document).ready(function(){
+  var ecwd_events_popup_button = jQuery('.ecwd_events_popup_button');
+  if(ecwd_events_popup_button.length>0){
+    ecwd_events_popup_button.magnificPopup({
+      type:'inline',
+      callbacks: {
+
+      }
+    });
+  }
+
+    var ecwd_delete_past_events = jQuery(".ecwd_delete_past_events a");
+    if(ecwd_delete_past_events.length>0){
+        ecwd_delete_past_events.magnificPopup({
+            type:'inline',
+            callbacks: {
+
+            }
+        });
+    }
+
+  jQuery('#ecwd_ask_question').parent().attr('target','_blank');
+
+
+});
+
+var $ = jQuery;
+$('body').on('click', '.ecwd_events_popup_button', function (){
+  if(typeof ecwd_table !== "undefined"){
+    ecwd_table.destroy();
+  }
+  $(".ecwd_event_table").remove();
+  ecwd_get_events();
+});
+function ecwd_get_events() {
+  if(ecwdServerVars.calendar_id != "" && typeof ecwdServerVars.calendar_id != "undefined"){
+    var calendar_id = ecwdServerVars.calendar_id;
+  }else{
+    var calendar_id = jQuery("#post_ID").val();
+  }
+  var url = ecwdServerVars.rest_route+'excluded_event';
+  var request_url = ecwd_updateQueryStringParameter(url, 'nonce', ecwdServerVars.ecwdRestNonce);
+  request_url = ecwd_updateQueryStringParameter(request_url, 'calendar_id', calendar_id);
+  $(".ecwd_event_list_popup_loader").css({
+    'display':'block'
+  });
+  $(".ecwd_add_events").addClass('ecwd_add_events_button');
+  $.ajax({
+    url: request_url,
+    type: 'GET',
+    dataType: 'json',
+    success: function(data) {
+      $(".ecwd_event_list_popup_loader").css({
+        'display':'none'
+      });
+      $(".ecwd_add_events").removeClass('ecwd_add_events_button');
+      var ecwd_event_list = "";
+      $.each(data.data, function (key, value ) {
+        ecwd_event_list+="<tr data-id='"+value.id+"' data-title='"+value.title+"'><td></td><td>"+value.title+"</td><td>"+value.from+"</td><td>"+value.end+"</td></tr>";
+      });
+      var ecwd_event_table = '' +
+        '<table class="ecwd_event_table display" style="width:100%">' +
+        '<thead>' +
+        '<th><input type="checkbox" name="select_all" value="1" id="ecwd-select-all"></th>'+
+        '<th>Title</th>' +
+        '<th>Start date</th>' +
+        '<th>End date</th>' +
+        '</thead>' +
+        '<tbody>' +
+        ecwd_event_list+
+        '</tbody>' +
+        '<tfoot>' +
+
+        '</tfoot>' +
+        '<th></th>'+
+        '<th>Title</th>' +
+        '<th>Start date</th>' +
+        '<th>End date</th>' +
+        '</tfoot>' +
+        '</table>';
+
+
+
+      $(".ecwd_event_table").remove();
+      $("#ecwd_event_list_popup").prepend(ecwd_event_table);
+      ecwd_table = $('.ecwd_event_table').DataTable({
+        'columnDefs': [{
+          'targets': 0,
+          'searchable':false,
+          'orderable':false,
+          'className': 'dt-body-center',
+          'render': function (data, type, full, meta){
+            return '<input type="checkbox" name="id[]"  value="">';
+          }
+        }],
+        'order': [[1, 'asc']]
+      });
+
+      $('body').on('click', '#ecwd-select-all', function (){
+        var rows = ecwd_table.rows({ 'search': 'applied' }).nodes();
+        $('input[type="checkbox"]', rows).prop('checked', this.checked);
+      });
+
+
+      $('.ecwd_event_table tbody').on('change', 'input[type="checkbox"]', function(){
+        if(!this.checked){
+          $('#ecwd-select-all').attr('checked', false);
+        }
+      });
+    },
+    error: function() {
+
+    },
+    beforeSend: setHeader
+  });
+
+  function setHeader(xhr) {
+    xhr.setRequestHeader('X-WP-Nonce', ecwdServerVars.wpRestNonce);
+  }
+}
+
+$('body').on('click','.ecwd_add_events',function (e) {
+  e.preventDefault();
+  $('#ecwd_event_list_popup').magnificPopup('close');
+  var ecwd_event_data = [];
+
+
+  ecwd_table.$('input[type="checkbox"]').each(function(){
+    if(this.checked){
+      var main_tr = this.closest("tr");
+      var event_id = $(main_tr).data("id");
+      var event_title = $(main_tr).data("title");
+
+
+      ecwd_event_data.push({
+        event_id:event_id,
+      });
+      var ecwd_added_event = '<span class="ecwd-calendar-event"> <span>'+ECWDescapeHtml(event_title)+'</span>\n' +
+        '                                <input type="hidden" name="ecwd-calendar-event-id[]" value="'+event_id+'">\n' +
+        '                                <span class="ecwd-calendar-event-edit"><a href="post.php?post=21&amp;action=edit" target="_blank">e</a></span>\n' +
+        '                                <span class="ecwd-calendar-event-delete">x</span>\n' +
+        '                            </span>';
+      $("#ecwd_calendar_meta table .ecwd-events").append(ecwd_added_event);
+    }
+  });
+  ecwd_ajax_add_events(ecwd_event_data);
+});
+
+function ecwd_ajax_add_events(ecwd_event_data ) {
+  var calendar_id = $('#post_ID').val();
+  var url = ecwdServerVars.rest_route+'add_event';
+  var request_url = ecwd_updateQueryStringParameter(url, 'nonce', ecwdServerVars.ecwdRestNonce);
+
+  $.ajax({
+    url: request_url,
+    type: 'POST',
+    dataType: 'json',
+    data: {calendar_id:calendar_id, ecwd_data:ecwd_event_data ,nonce: ecwdServerVars.ecwdRestNonce },
+    success: function(data) {
+      if(data.success){
+        ecwd_table.destroy();
+        if(data.free_events_count == 0){
+          var new_post_url = $(".ecwd_events_popup_button").data('new_event_url');
+          $(".ecwd_events_popup_button").remove();
+          $(".ecwd-calendar-event-add").html('<a href="'+new_post_url+'" target="_blank">Create more events</a><a href="\'+new_post_url+\'" target="_blank"><span class="add_event_plus">+</span></a></span>');
+        }
+      }
+    },
+    error: function() {},
+    beforeSend: setHeader
+  });
+  function setHeader(xhr) {
+    xhr.setRequestHeader('X-WP-Nonce', ecwdServerVars.wpRestNonce);
+  }
+}
+function ecwd_updateQueryStringParameter(uri, key, value) {
+  var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+  var separator = uri.indexOf('?') !== -1 ? "&" : "?";
+  if (uri.match(re)) {
+    return uri.replace(re, '$1' + key + "=" + value + '$2');
+  }
+  else {
+    return uri + separator + key + "=" + value;
+  }
+}
+
+
+
+
+$('body').on('click', '.ecwd_delete_past_events a', function (){
+  if(typeof ecwd_past_events_table !== "undefined"){
+    ecwd_past_events_table.destroy();
+  }
+  $(".ecwd_past_event_table").remove();
+  ecwd_get_past_events();
+});
+function ecwd_get_past_events() {
+  var url = ecwdServerVars.rest_route+'past_event';
+  var request_url = ecwd_updateQueryStringParameter(url, 'nonce', ecwdServerVars.ecwdRestNonce);
+  $(".ecwd_past_event_list_popup_loader").css({
+    'display':'block'
+  });
+  $(".ecwd_past_events_delete_button").addClass('ecwd_delete_events_button');
+  $.ajax({
+    url: request_url,
+    type: 'GET',
+    dataType: 'json',
+    success: function(data) {
+      $(".ecwd_past_event_list_popup_loader").css({
+        'display':'none'
+      });
+      $(".ecwd_past_events_delete_button").removeClass('ecwd_delete_events_button');
+      var ecwd_event_list = "";
+      $.each(data.data, function (key, value ) {
+        ecwd_event_list+="<tr data-id='"+value.id+"' data-title='"+value.title+"'><td></td><td>"+value.title+"</td><td>"+value.from+"</td><td>"+value.end+"</td></tr>";
+      });
+      var ecwd_event_table = '' +
+        '<table class="ecwd_past_event_table display" style="width:100%">' +
+        '<thead>' +
+        '<th><input type="checkbox" name="select_all" value="1" id="ecwd-select-all"></th>'+
+        '<th>Title</th>' +
+        '<th>Start date</th>' +
+        '<th>End date</th>' +
+        '</thead>' +
+        '<tbody>' +
+        ecwd_event_list+
+        '</tbody>' +
+        '<tfoot>' +
+
+        '</tfoot>' +
+        '<th></th>'+
+        '<th>Title</th>' +
+        '<th>Start date</th>' +
+        '<th>End date</th>' +
+        '</tfoot>' +
+        '</table>';
+
+
+
+      $(".ecwd_event_table").remove();
+      $(".ecwd_popup_notice").remove();
+      $(".ecwd_popup_title").remove();
+      $("#ecwd_past_event_list_popup").prepend(ecwd_event_table);
+      $("#ecwd_past_event_list_popup").prepend("<h4 class='ecwd_popup_notice'>Recurring events are excluded from this list</h4>");
+      $("#ecwd_past_event_list_popup").prepend("<h3 class='ecwd_popup_title'>Delete past events</h3>");
+      ecwd_past_events_table = $('.ecwd_past_event_table').DataTable({
+        'columnDefs': [{
+          'targets': 0,
+          'searchable':false,
+          'orderable':false,
+          'className': 'dt-body-center',
+          'render': function (data, type, full, meta){
+            return '<input type="checkbox" name="id[]"  value="">';
+          }
+        }],
+        'order': [[1, 'asc']]
+      });
+
+      $('body').on('click', '#ecwd-select-all', function (){
+        var rows = ecwd_past_events_table.rows({ 'search': 'applied' }).nodes();
+        $('input[type="checkbox"]', rows).prop('checked', this.checked);
+      });
+
+
+      $('.ecwd_event_table tbody').on('change', 'input[type="checkbox"]', function(){
+        if(!this.checked){
+          $('#ecwd-select-all').attr('checked', false);
+        }
+      });
+    },
+    error: function() {
+
+    },
+    beforeSend: setHeader
+  });
+
+  function setHeader(xhr) {
+    xhr.setRequestHeader('X-WP-Nonce', ecwdServerVars.wpRestNonce);
+  }
+}
+$('body').on('click','.ecwd_past_events_delete_button',function (e) {
+  e.preventDefault();
+  $('#ecwd_past_event_list_popup').magnificPopup('close');
+  var ecwd_past_event_data = [];
+
+
+  ecwd_past_events_table.$('input[type="checkbox"]').each(function(){
+    if(this.checked){
+      var main_tr = this.closest("tr");
+      var event_id = $(main_tr).data("id");
+      ecwd_past_event_data.push(
+        event_id
+      );
+    }
+  });
+  if(ecwd_past_event_data.length>0){
+    ecwd_ajax_delete_events(ecwd_past_event_data);
+  }
+});
+
+function ecwd_ajax_delete_events(data) {
+  var url = ecwdServerVars.rest_route+'delete_event';
+  var request_url = ecwd_updateQueryStringParameter(url, 'nonce', ecwdServerVars.ecwdRestNonce);
+  $.ajax({
+    url: request_url,
+    type: 'POST',
+    dataType: 'json',
+    data: { events_id:data ,nonce: ecwdServerVars.ecwdRestNonce },
+    success: function(data) {
+      if(data.success){
+
+      }
+    },
+    error: function() {},
+    beforeSend: setHeader
+  });
+  function setHeader(xhr) {
+    xhr.setRequestHeader('X-WP-Nonce', ecwdServerVars.wpRestNonce);
+  }
+
+}
+
+function ECWDescapeHtml(str) {
+    return str.replace(/[&<>"'\/]/g, function (s) {
+        var entityMap = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': '&quot;',
+            "'": '&#39;',
+            "/": '&#x2F;'
+        };
+
+        return entityMap[s];
+    });
+}
+

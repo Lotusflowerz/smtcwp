@@ -18,12 +18,11 @@ if (!defined('ABSPATH')) {
 	<div id="ecwd-settings">
 		<div id="ecwd-settings-content" >
 			<h2 id="add_on_title"><?php echo esc_html(get_admin_page_title()); ?></h2>
-			<div>
-				<p>
-					<span style="color: #ba281e; font-size: 20px;">Attention:</span> Add-ons are supported by premium version of Event Calendar WD
-				</p>
-			</div>
-
+      <div>
+        <p>
+          <span style="color: #ba281e; font-size: 20px;">Attention:</span> Extensions are Available in <a target="_blank" href="<?php echo 'https://10web.io/plugins/wordpress-event-calendar/?utm_source=event_calendar&utm_medium=free_plugin#plugin_steps'; ?>">10Web Plugins Bundle</a>
+        </p>
+      </div>
 			<?php
 			if($addons){
 				foreach ($addons as $name=>$cat) {
@@ -54,7 +53,7 @@ if (!defined('ABSPATH')) {
 							</figure>
 							<?php if ( $addon['url'] !== '#' ) { ?>
 								<a href="<?php echo $addon['url'] ?>"
-								   target="_blank" class="ecwd-addon"><span>GET THIS ADD ON</span></a>
+								   target="_blank" class="ecwd-addon"><span>GET THIS EXTENSION</span></a>
 
 							<?php } else { ?>
 								<div class="ecwd_coming_soon">
@@ -73,4 +72,4 @@ if (!defined('ABSPATH')) {
 		<!-- #ecwd-settings-content -->
 	</div>
 	<!-- #ecwd-settings -->
-</div><!-- .wrap -->``
+</div><!-- .wrap -->

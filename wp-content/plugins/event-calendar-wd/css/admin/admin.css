@@ -243,6 +243,7 @@
 #ecwd-settings-content .nav-tab-wrapper a {
     display: inline-block;
     border: 1px solid #A5A5A5;
+	margin-bottom:6px;
 }
 
 .ecwd-tabs li a,
@@ -341,20 +342,25 @@ span.ecwd_error {
     font-size: 17px;
 }
 
-#ecwd-settings a.button :not(.wd_notice_button) {
-    border: 1px solid #A1A1A1;
-    padding: 0px 15px;
-    box-shadow: none;
-    border-radius: 0;
-    color: #000;
-    font-weight: bold;
+/*#ecwd-settings a.button:not(.wdi_notice_button) {*/
+    /*border: 1px solid #A1A1A1;*/
+    /*padding: 0px 15px;*/
+    /*box-shadow: none;*/
+    /*border-radius: 0;*/
+    /*color: #000;*/
+    /*font-weight: bold;*/
+/*}*/
+
+/*#ecwd-settings a.button:hover {*/
+    /*border: 1px solid transparent;*/
+    /*color: #fff;*/
+    /*background: #0074A2;*/
+/*}*/
+
+#ecwd_reset_settings_button{
+    margin-left: 4px;
 }
 
-#ecwd-settings a.button:hover {
-    border: 1px solid transparent;
-    color: #fff;
-    background: #0074A2;
-}
 
 #ecwd_event_location{
     background-image: none !important;
@@ -470,16 +476,16 @@ span.ecwd_error {
     top: 2px;
 }
 
-#ecwd-settings input[type="submit"] {
-    background: #0074A2;
-    color: #ffffff;
-    font-weight: bold;
-    font-size: 15px;
-    border: 0;
-    border-radius: 0;
-    padding: 5px 25px;
-    height: auto;
-}
+/*#ecwd-settings input[type="submit"] {*/
+    /*background: #0074A2;*/
+    /*color: #ffffff;*/
+    /*font-weight: bold;*/
+    /*font-size: 15px;*/
+    /*border: 0;*/
+    /*border-radius: 0;*/
+    /*padding: 5px 25px;*/
+    /*height: auto;*/
+/*}*/
 
 #ecwd_event_meta .checkbox-div label,
 #ecwd_event_venue_meta .checkbox-div label,
@@ -1019,4 +1025,51 @@ body.wp-admin.post-type-ecwd_event #posts-filter .alignleft.actions a.button {
     font-weight: bold;
     padding: 0 18px 0 18px;
     vertical-align: middle;
+}
+.post-type-ecwd_event fieldset.inline-edit-date {
+    display: none;
+}
+
+.ecwd_event_list_popup_loader, .ecwd_past_event_list_popup_loader{
+    display: none;
+    margin: 0 auto;
+    width: 70px;
+    margin-top: calc(100px - 35px);
+}
+.ecwd_add_events_button, .ecwd_delete_events_button{
+    display: none !important;
+}
+.ecwd_add_events ,.ecwd_past_events_delete_button{
+    float: left;
+}
+#open-popup {padding:20px}
+.ecwd_event_list_popup, .ecwd_past_event_list_popup {
+    position: relative;
+    background: #FFF;
+    padding: 10px 40px 50px 40px;
+    width: auto;
+    max-width: 800px;
+    margin: 20px auto;
+    text-align: center;
+    min-height: 200px;
+}
+.ecwd_popup_notice, .ecwd_popup_title{
+    width: 100%;
+    text-align: left;
+}
+.ecwd_popup_notice{
+    margin-bottom: 50px;
+
+}
+
+.ecwd_custom_date .checkbox-div-content{
+    width: 170px;
+    display: inline-block;
+}
+.ecwd_custom_date input.ecwd_custom_date_el{
+    width: 50px !important;
+}
+.ecwd_custom_date {
+    margin-bottom: 5px;
+
 }

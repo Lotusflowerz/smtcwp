@@ -5,7 +5,7 @@ if (isset($_POST["skip_wizard"])) {
     die;
 }
 if (isset($_POST["ecwd_settings_general"]) && isset($_POST["ecwd_settings_general"]["install_sample_data"]) && $_POST["ecwd_settings_general"]["install_sample_data"] == "1") {
-    sample_data_creator();
+    //sample_data_creator();
 }
 if (isset($_POST["ecwd_settings_general"])) {
     $sett = get_option("ecwd_settings_general");
@@ -19,7 +19,7 @@ if (isset($_POST["ecwd_settings_general"])) {
     update_option("ecwd_settings_general", $sett);
 //    header('Location: ?activate=false&plugin_status=all&paged=1&s=');
     header('Location: admin.php?page=ecwd_subscribe');
-    update_option("activation_page_option", "ok");
+    //update_option("activation_page_option", "ok");
 }
 
 function sample_data_creator() {
@@ -111,8 +111,8 @@ function ecwd_settings_init() {
     }
     $ecwd_settings["general"][] = array(
         'id' => 'install_sample_data',
-        'name' => __('Install sample data', 'ecwd'),
-        'desc' => __('Check to install sample data.', 'ecwd'),
+        'name' => __('Install sample data', 'event-calendar-wd'),
+        'desc' => __('Check to install sample data.', 'event-calendar-wd'),
         'type' => 'radio',
         'default' => 1
     );

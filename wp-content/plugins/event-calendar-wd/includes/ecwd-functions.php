@@ -4,7 +4,7 @@
 function ecwd_print_calendar($calendar_ids, $display = 'mini', $args = array(), $widget = false, $ajax = false, $ecwd_views = array(), $preview = false) {
 
     if(extension_loaded('calendar') === false){
-        return __("Event Calendar WD requires PHP Calendar module to display events. Contact your hosting provider or enable it manually.", "ecwd");
+        return __("Event Calendar WD requires PHP Calendar module to display events. Contact your hosting provider or enable it manually.", "event-calendar-wd");
     }
 
     global $ecwd_options;
@@ -14,7 +14,7 @@ function ecwd_print_calendar($calendar_ids, $display = 'mini', $args = array(), 
     wp_localize_script(ECWD_PLUGIN_PREFIX . '-public', 'ecwd', array(
         'ajaxurl' => admin_url('admin-ajax.php'),
         'ajaxnonce' => wp_create_nonce(ECWD_PLUGIN_PREFIX . '_ajax_nonce'),
-        'loadingText' => __('Loading...', 'ecwd'),
+        'loadingText' => __('Loading...', 'event-calendar-wd'),
         'plugin_url' => ECWD_URL,
         'gmap_key'=>$gmap_key,
         'gmap_style' => (isset($ecwd_options['gmap_style'])) ? $ecwd_options['gmap_style'] : ""
@@ -146,8 +146,7 @@ function ecwd_ajax() {
     $args = array();
     $display = '';
     if (isset($_POST[ECWD_PLUGIN_PREFIX . '_link'])) {
-        $link = esc_html($_POST[ECWD_PLUGIN_PREFIX . '_link']);
-        parse_str($link, $link_arr);
+      $link = esc_html(strip_tags(htmlspecialchars_decode($_POST[ECWD_PLUGIN_PREFIX . '_link'])));        parse_str($link, $link_arr);
         $date = $link_arr['?date'];
         $page = isset($link_arr['amp;cpage']) ? $link_arr['amp;cpage'] : 1;
 
@@ -304,6 +303,10 @@ function ecwd_event_content($content) {
             ob_start();
             include(ECWD_DIR . '/views/ecwd-venue-content.php');
             $content = ob_get_clean();
+        } elseif ($post->post_type == ECWD_PLUGIN_PREFIX . '_event' && isset($ecwd_options['use_custom_template']) && $ecwd_options['use_custom_template'] == '0' && !isset($_GET['iframe'])) {
+            ob_start();
+            include(ECWD_DIR . '/views/ecwd-event-content.php');
+            $content = ob_get_clean();
         }
     }
 
@@ -332,16 +335,6 @@ function getAndReplaceFirstImage($content) {
 }
 
 add_filter('the_content', ECWD_PLUGIN_PREFIX . '_event_content');
-
-//add_filter('template_include', ECWD_PLUGIN_PREFIX . '_set_template');
-
-function ecwd_set_template($template) {
-    if (is_singular(ECWD_PLUGIN_PREFIX . '_event') && ECWD_DIR . '/views/ecwd-event-content.php' != $template) {
-        $template = ECWD_DIR . '/views/ecwd-event-content.php';
-    }
-
-    return $template;
-}
 
 function ecwd_event_post($post) {
     global $ecwd_options;
@@ -385,7 +378,7 @@ function ecwd_add_meta_tags() {
                 if ($ecwd_event_date_to && date($date_format, strtotime($ecwd_event_date_from)) !== date($date_format, strtotime($ecwd_event_date_to))) {
                     $description .= ' - ' . date($date_format, strtotime($ecwd_event_date_to));
                 }
-                $description .= '  ' . __('All day', 'ecwd') . ' ';
+                $description .= '  ' . __('All day', 'event-calendar-wd') . ' ';
             }
         } else {
             $description .= date($date_format, strtotime($ecwd_event_date_from)) . ' ' . date($time_format, strtotime($ecwd_event_date_from));
@@ -462,10 +455,10 @@ function ecwd_print_countdown($event_id, $widget = 1, $theme_id = null, $args = 
         $markup .= '<div class="ecwd_countdown">';
         $markup .= '<input type="hidden" name="ecwd_end_time" value="' . $start . '"/>';
         $markup .= '<input type="hidden" name="ecwd_timezone" value="' . $diff . '"/>';
-        $markup .= '<input type="hidden" name="ecwd_text_days" value="' . __('DAYS', 'ecwd') . '"/>';
-        $markup .= '<input type="hidden" name="ecwd_text_hours" value="' . __('HOURS', 'ecwd') . '"/>';
-        $markup .= '<input type="hidden" name="ecwd_text_minutes" value="' . __('MINUTES', 'ecwd') . '"/>';
-        $markup .= '<input type="hidden" name="ecwd_text_seconds" value="' . __('SECONDS', 'ecwd') . '"/>';
+        $markup .= '<input type="hidden" name="ecwd_text_days" value="' . __('DAYS', 'event-calendar-wd') . '"/>';
+        $markup .= '<input type="hidden" name="ecwd_text_hours" value="' . __('HOURS', 'event-calendar-wd') . '"/>';
+        $markup .= '<input type="hidden" name="ecwd_text_minutes" value="' . __('MINUTES', 'event-calendar-wd') . '"/>';
+        $markup .= '<input type="hidden" name="ecwd_text_seconds" value="' . __('SECONDS', 'event-calendar-wd') . '"/>';
         $markup .= '<input type="hidden" name="ecwd_finish_text" value="' . $finish_text . '"/>';
         if ($theme_id) {
             $theme = get_post_meta($theme_id, 'ecwd_countdown_theme', true);

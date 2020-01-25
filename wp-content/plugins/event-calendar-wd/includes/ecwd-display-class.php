@@ -338,7 +338,7 @@ class ECWD_Display {
         $charlength++;
 
         if (mb_strlen($excerpt) > $charlength) {
-            $read_more = '<a href="'.$permalink.'">[' . __('Read more', 'ecwd') . ']</a>';
+            $read_more = '<a href="'.$permalink.'">[' . __('Read more', 'event-calendar-wd') . ']</a>';
             $subex = mb_substr($excerpt, 0, $charlength);
             $exwords = explode(' ', $subex);
             $excut = -(mb_strlen($exwords[count($exwords) - 1]));
@@ -1470,8 +1470,9 @@ class ECWD_Display {
         if (is_array($array) && !empty($array)) {
             $events_ids = array();
             foreach ($array as $key => $event) {
-                if (!in_array($event['id'], $events_ids)) {
-                    $events_ids[] = $event['id'];
+                $id = $event['id'] . $event['from'] . $event['to'];
+                if (!in_array($id, $events_ids)) {
+                    $events_ids[] = $id;
                 } else {
                     unset($array[$key]);
                 }

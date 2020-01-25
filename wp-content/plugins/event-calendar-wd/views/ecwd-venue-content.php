@@ -26,8 +26,8 @@ $meta = get_post_meta($post_id);
 $events = array();
 
 // Load up all post meta data
-$ecwd_venue_location = get_post_meta($post->ID, ECWD_PLUGIN_PREFIX . '_venue_location', true);
-$ecwd_venue_latlong = get_post_meta($post->ID, ECWD_PLUGIN_PREFIX . '_venue_lat_long', true);
+$ecwd_venue_location = esc_html(get_post_meta($post->ID, ECWD_PLUGIN_PREFIX . '_venue_location', true));
+$ecwd_venue_latlong = esc_html(get_post_meta($post->ID, ECWD_PLUGIN_PREFIX . '_venue_lat_long', true));
 $ecwd_venue_zoom = get_post_meta($post->ID, ECWD_PLUGIN_PREFIX . '_map_zoom', true);
 if (!$ecwd_venue_zoom) {
   $ecwd_venue_zoom = 17;
@@ -92,8 +92,8 @@ $events = $d->events_unique($events);
 $venue_meta_template = '<div class="%s"><span>%s:</span><span>%s</span></div>';
 $venue_meta_link_template = '<div class="%s"><span>%s:</span><a href="%s">%s</a></div>';
 
-$ecwd_venue_phone = get_post_meta($post_id, 'ecwd_venue_meta_phone', true);
-$ecwd_venue_website = get_post_meta($post_id, 'ecwd_venue_meta_website', true);
+$ecwd_venue_phone = esc_html(get_post_meta($post_id, 'ecwd_venue_meta_phone', true));
+$ecwd_venue_website = esc_url(get_post_meta($post_id, 'ecwd_venue_meta_website', true));
 $ecwd_venue_website = ECWD::add_http($ecwd_venue_website);
 $ecwd_venue_show_map = get_post_meta($post_id, 'ecwd_venue_show_map', true);
 ?>
@@ -101,15 +101,15 @@ $ecwd_venue_show_map = get_post_meta($post_id, 'ecwd_venue_show_map', true);
 <div class="ecwd-venue">
   <?php
   if (!empty($ecwd_venue_location)) {
-    echo sprintf($venue_meta_template, "ecwd_venue_location", __('Location', 'ecwd'), $ecwd_venue_location);
+    echo sprintf($venue_meta_template, "ecwd_venue_location", __('Location', 'event-calendar-wd'), $ecwd_venue_location);
   }
 
   if (!empty($ecwd_venue_phone)) {
-    echo sprintf($venue_meta_template, "ecwd_venue_phone", __('Phone', 'ecwd'), $ecwd_venue_phone);
+    echo sprintf($venue_meta_template, "ecwd_venue_phone", __('Phone', 'event-calendar-wd'), $ecwd_venue_phone);
   }
 
   if (!empty($ecwd_venue_website)) {
-    echo sprintf($venue_meta_link_template, "ecwd_venue_website", __('Website', 'ecwd'), $ecwd_venue_website, $ecwd_venue_website);
+    echo sprintf($venue_meta_link_template, "ecwd_venue_website", __('Website', 'event-calendar-wd'), $ecwd_venue_website, $ecwd_venue_website);
   }
 
   echo '<div class="ecwd_venue_description">' . wpautop($post->post_content) . '</div>';

@@ -64,21 +64,21 @@ if (!class_exists('Tax_CTP_Filter')) {
                     echo "</select>";
                 }
                 echo "<div style='display:inline-block;'>";
-                _e('From', 'ecwd');?>
+                _e('From', 'event-calendar-wd');?>
                 <input type="text" style="width: 90px"
                        id="<?php echo ECWD_PLUGIN_PREFIX; ?>_date_from_filter"
                        name="<?php echo ECWD_PLUGIN_PREFIX; ?>_date_from_filter"
                        class="<?php echo ECWD_PLUGIN_PREFIX; ?>_event_date"
-                       value="<?php echo isset($_GET[ECWD_PLUGIN_PREFIX.'_date_from_filter'])? htmlentities(sanitize_text_field($_GET[ECWD_PLUGIN_PREFIX.'_date_from_filter'])): ''; ?>" />
+                       value="<?php echo isset($_GET[ECWD_PLUGIN_PREFIX.'_date_from_filter'])? htmlentities(sanitize_text_field($_GET[ECWD_PLUGIN_PREFIX.'_date_from_filter'])): ''; ?>"  autocomplete="off"/>
                 <?php
-                 _e('To', 'ecwd');?>
+                 _e('To', 'event-calendar-wd');?>
                 <input type="text" style="width: 90px"
                        id="<?php echo ECWD_PLUGIN_PREFIX; ?>_date_to_filter"
                        name="<?php echo ECWD_PLUGIN_PREFIX; ?>_date_to_filter"
                        class="<?php echo ECWD_PLUGIN_PREFIX; ?>_event_date"
-                       value="<?php echo isset($_GET[ECWD_PLUGIN_PREFIX.'_date_to_filter'])? htmlentities(sanitize_text_field($_GET[ECWD_PLUGIN_PREFIX.'_date_to_filter'])): ''; ?>" />
+                       value="<?php echo isset($_GET[ECWD_PLUGIN_PREFIX.'_date_to_filter'])? htmlentities(sanitize_text_field($_GET[ECWD_PLUGIN_PREFIX.'_date_to_filter'])): ''; ?>"   autocomplete="off"/>
                 </div>
-                <a href="<?php echo admin_url( 'edit.php?post_type=ecwd_event' );?>" class="button" >Reset</a>
+                <a href="<?php echo admin_url( 'edit.php?post_type=ecwd_event' );?>" class="button" ><?php _e('Reset','event-calendar-wd')?></a>
                 <?php
             }
         }

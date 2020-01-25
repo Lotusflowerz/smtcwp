@@ -36,8 +36,19 @@ if (isset($ecwd_options['social_icons']) && $ecwd_options['social_icons'] != '')
 
 $ecwd_event = $post;
 $ecwd_event_metas = get_post_meta($ecwd_event->ID, '', true);
-$ecwd_event_date_from = $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_date_from'][0];
-$ecwd_event_date_to = $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_date_to'][0];
+if(isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_date_from'][0])) {
+  $ecwd_event_date_from = $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_date_from'][0];
+  $ecwd_event_date_to = $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_date_to'][0];
+
+  $is_default_dates = false;
+}else{
+  $today = date('Y-m-d H:i');
+
+  $ecwd_event_date_from = date('Y/m/d H:i', strtotime($today . "+1 days"));
+  $ecwd_event_date_to = date('Y/m/d H:i', strtotime($ecwd_event_date_from . "+1 hour"));
+
+  $is_default_dates = true;
+}
 $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_url'] = array(0 => '');
 if (!isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_location'])) {
   $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_location'] = array(0 => '');
@@ -109,8 +120,8 @@ $venue_meta_template = '<div class="%s"><span>%s:</span><span>%s</span></div>';
 $venue_meta_link_template = '<div class="%s"><span>%s:</span><a href="%s">%s</a></div>';
 
 if (is_numeric($venue_post_id)) {
-  $ecwd_venue_phone = get_post_meta($venue_post_id, 'ecwd_venue_meta_phone', true);
-  $ecwd_venue_website = get_post_meta($venue_post_id, 'ecwd_venue_meta_website', true);
+  $ecwd_venue_phone = esc_html(get_post_meta($venue_post_id, 'ecwd_venue_meta_phone', true));
+  $ecwd_venue_website = esc_url(get_post_meta($venue_post_id, 'ecwd_venue_meta_website', true));
   $ecwd_venue_website = ECWD::add_http($ecwd_venue_website);
 } else {
   $ecwd_venue_phone = $ecwd_venue_website = "";
@@ -148,7 +159,7 @@ $event_categories = wp_get_post_terms($post->ID, 'ecwd_event_category', $args);
   <div id="post-<?php echo $post_id; ?>">
     <div class="ecwd-event" itemscope itemtype="http://schema.org/Event">
       <header class="entry-header">
-        <h1 class="ecwd-events-single-event-title summary entry-title"><?php echo $post->post_title; ?></h1>
+        <h1 class="ecwd-events-single-event-title summary entry-title"><?php echo apply_filters('the_title', $post->post_title); ?></h1>
       </header>
       <div class="event-detalis">
         <?php if ($featured_image && $featured_image !== '') { ?>
@@ -158,14 +169,14 @@ $event_categories = wp_get_post_terms($post->ID, 'ecwd_event_category', $args);
         <?php } ?>
         <div class="ecwd-event-details">
           <div class="event-detalis-date">
-            <label class="ecwd-event-date-info" title="<?php _e('Date', 'ecwd'); ?>"></label>
+            <label class="ecwd-event-date-info" title="<?php _e('Date', 'event-calendar-wd'); ?>"></label>
             <span class="ecwd-event-date"
                   itemprop="startDate"
                   content="<?php echo date('Y-m-d', strtotime($ecwd_event_date_from)) . 'T' . date('H:i', strtotime($ecwd_event_date_from)) ?>">
               <?php echo ECWD::get_ecwd_event_date_view($ecwd_event_date_from, $ecwd_event_date_to, $ecwd_all_day_event); ?>
             </span>
           </div>
-          <?php if (isset($ecwd_options['show_repeat_rate'])) { ?>
+          <?php if (isset($ecwd_options['show_repeat_rate']) && !$is_default_dates) { ?>
             <div class="ecwd_repeat_rate_text">
               <span><?php echo $d->get_repeat_rate($post_id, '', $date_format); ?></span>
             </div>
@@ -175,7 +186,7 @@ $event_categories = wp_get_post_terms($post->ID, 'ecwd_event_category', $args);
             ?>
             <div class="ecwd-url">
               <a href="<?php echo $ecwd_event_url; ?>" target="_blank">
-                <label class="ecwd-event-url-info" title="<?php _e('Url', 'ecwd'); ?>"></label>
+                <label class="ecwd-event-url-info" title="<?php _e('Url', 'event-calendar-wd'); ?>"></label>
                 <?php echo $ecwd_event_url; ?>
               </a>
             </div>
@@ -183,7 +194,7 @@ $event_categories = wp_get_post_terms($post->ID, 'ecwd_event_category', $args);
 
           if (count($organizers) > 0) { ?>
             <div class="event-detalis-org">
-              <label class="ecwd-event-org-info" title="<?php _e('Organizers', 'ecwd'); ?>"></label>
+              <label class="ecwd-event-org-info" title="<?php _e('Organizers', 'event-calendar-wd'); ?>"></label>
 
               <?php if (count($organizers) > 1) { ?>
                 <?php foreach ($organizers as $organizer) { ?>
@@ -211,15 +222,15 @@ $event_categories = wp_get_post_terms($post->ID, 'ecwd_event_category', $args);
 
                 if (!empty($organizer_phone)) { ?>
                   <div class="ecwd_organizer_phone">
-                    <span><?php _e('Phone', 'ecwd'); ?>:</span>
+                    <span><?php _e('Phone', 'event-calendar-wd'); ?>:</span>
                     <span><?php echo $organizer_phone; ?></span>
                   </div>
                 <?php }
                 if (!empty($organizer_website)) { ?>
                   <div class="ecwd_organizer_website">
-                    <span><?php _e('Website', 'ecwd'); ?>:</span>
-                    <a href="<?php echo $organizer_website; ?>">
-                      <?php echo $organizer_website; ?>
+                    <span><?php _e('Website', 'event-calendar-wd'); ?>:</span>
+                    <a href="<?php echo esc_url($organizer_website);  ?>">
+                      <?php echo esc_html($organizer_website); ?>
                     </a>
                   </div>
                 <?php }
@@ -229,22 +240,22 @@ $event_categories = wp_get_post_terms($post->ID, 'ecwd_event_category', $args);
 
           <div class="event-venue" itemprop="location" itemscope itemtype="http://schema.org/Place">
             <?php if ($venue_post_id) { ?>
-              <label class="ecwd-venue-info" title="<?php _e('Venue', 'ecwd'); ?>"></label>
+              <label class="ecwd-venue-info" title="<?php _e('Venue', 'event-calendar-wd'); ?>"></label>
               <span itemprop="name"><a href="<?php echo $venue_permalink ?>"><?php echo $venue; ?></a></span>
               <?php
 
               if (!empty($ecwd_venue_phone)) {
-                echo sprintf($venue_meta_template, "ecwd_venue_phone", __('Phone', 'ecwd'), $ecwd_venue_phone);
+                echo sprintf($venue_meta_template, "ecwd_venue_phone", __('Phone', 'event-calendar-wd'), $ecwd_venue_phone);
               }
 
               if (!empty($ecwd_venue_website)) {
-                echo sprintf($venue_meta_link_template, "ecwd_venue_website", __('Website', 'ecwd'), $ecwd_venue_website, $ecwd_venue_website);
+                echo sprintf($venue_meta_link_template, "ecwd_venue_website", __('Website', 'event-calendar-wd'), $ecwd_venue_website, $ecwd_venue_website);
               }
 
               if (!empty($ecwd_event_location)) {
                 ?>
                 <div class="address" itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
-                  <span><?php _e('Address:', 'ecwd'); ?></span>
+                  <span><?php _e('Address:', 'event-calendar-wd'); ?></span>
                   <span><?php echo $ecwd_event_location; ?></span>
                 </div>
                 <?php
@@ -252,7 +263,7 @@ $event_categories = wp_get_post_terms($post->ID, 'ecwd_event_category', $args);
               ?>
             <?php } elseif ($ecwd_event_location) { ?>
               <span class="ecwd_hidden" itemprop="name"><?php echo $ecwd_event_location; ?></span>
-              <label class="ecwd-venue-info" title="<?php _e('Location', 'ecwd'); ?>"></label>
+              <label class="ecwd-venue-info" title="<?php _e('Location', 'event-calendar-wd'); ?>"></label>
               <span class="address" itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
                 <?php echo $ecwd_event_location; ?>
               </span>
@@ -264,15 +275,15 @@ $event_categories = wp_get_post_terms($post->ID, 'ecwd_event_category', $args);
       <?php if ($ecwd_social_icons) { ?>
         <div class="ecwd-social">
           <span class="share-links">
-            <a href="http://twitter.com/home?status=<?php echo get_permalink($post_id) ?>"
+            <a href="https://twitter.com/home?status=<?php echo get_permalink($post_id) ?>"
                class="ecwd-twitter"
                target="_blank" data-original-title="Tweet It">
               <span class="visuallyhidden">Twitter</span></a>
-            <a href="http://www.facebook.com/sharer.php?u=<?php echo get_permalink($post_id) ?>"
+            <a href="https://www.facebook.com/sharer.php?u=<?php echo get_permalink($post_id) ?>"
                class="ecwd-facebook"
                target="_blank" data-original-title="Share on Facebook">
               <span class="visuallyhidden">Facebook</span></a>
-            <a href="http://plus.google.com/share?url=<?php echo get_permalink($post_id) ?>"
+            <a href="https://plus.google.com/share?url=<?php echo get_permalink($post_id) ?>"
                class="ecwd-google-plus"
                target="_blank" data-original-title="Share on Google+">
               <span class="visuallyhidden">Google+</span></a>
@@ -291,7 +302,7 @@ $event_categories = wp_get_post_terms($post->ID, 'ecwd_event_category', $args);
         $map_events[0]['infow'] .= '<span class="location">' . $ecwd_event_location . '</span>';
         $map_events[0]['infow'] .= '</div>';
         $map_events[0]['infow'] .= '<div class="event-detalis-date">
-			 <label class="ecwd-event-date-info" title="' . __('Date', 'ecwd') . '"></label>
+			 <label class="ecwd-event-date-info" title="' . __('Date', 'event-calendar-wd') . '"></label>
 			 <span class="ecwd-event-date" itemprop="startDate" content="' . date('Y-m-d', strtotime($ecwd_event_date_from)) . 'T' . date('H:i', strtotime($ecwd_event_date_from)) . '">';
         $map_events[0]['infow'] .= ECWD::get_ecwd_event_date_view($ecwd_event_date_from, $ecwd_event_date_to, $ecwd_all_day_event);
         $map_events[0]['infow'] .= ' </span>
@@ -312,10 +323,10 @@ $event_categories = wp_get_post_terms($post->ID, 'ecwd_event_category', $args);
             parse_str(parse_url($ecwd_event_video, PHP_URL_QUERY), $video_array_of_vars);
             if (isset($video_array_of_vars['v']) && $video_array_of_vars['v']) {
               ?>
-              <object data="http://www.youtube.com/v/<?php echo $video_array_of_vars['v'] ?>"
+              <object data="https://www.youtube.com/v/<?php echo $video_array_of_vars['v'] ?>"
                       type="application/x-shockwave-flash" width="400" height="300">
                 <param name="src"
-                       value="http://www.youtube.com/v/<?php echo $video_array_of_vars['v'] ?>"/>
+                       value="https://www.youtube.com/v/<?php echo $video_array_of_vars['v'] ?>"/>
               </object>
               <?php
             }
@@ -324,7 +335,7 @@ $event_categories = wp_get_post_terms($post->ID, 'ecwd_event_category', $args);
             $videoID = $videoID[count($videoID) - 1];
             if ($videoID) { ?>
               <iframe
-                src="http://player.vimeo.com/video/<?php echo $videoID; ?>?title=0&amp;byline=0&amp;portrait=0&amp;badge=0&amp;color=ffffff"
+                src="https://player.vimeo.com/video/<?php echo $videoID; ?>?title=0&amp;byline=0&amp;portrait=0&amp;badge=0&amp;color=ffffff"
                 width="" height="" frameborder="0" webkitAllowFullScreen mozallowfullscreen
                 allowFullScreen></iframe>
               <?php

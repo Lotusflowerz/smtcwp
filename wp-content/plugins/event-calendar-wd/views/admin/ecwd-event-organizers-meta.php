@@ -4,6 +4,9 @@
  */
 global $post;
 
+$single_event = $this->single_event_for_metas;
+
+
 $post_id = $post->ID;
 $type = ECWD_PLUGIN_PREFIX . '_organizer';
 $args = array(
@@ -13,7 +16,7 @@ $args = array(
   'ignore_sticky_posts' => 1
 );
 $organizer_posts = get_posts($args);
-$event_organizers = get_post_meta($post->ID, ECWD_PLUGIN_PREFIX . '_event_organizers', true);
+$event_organizers = $single_event->organizers;
 if (!$event_organizers || $event_organizers == '' || !is_array($event_organizers)) {
   $event_organizers = array();
 }
@@ -21,38 +24,38 @@ if (!$event_organizers || $event_organizers == '' || !is_array($event_organizers
 ?>
 <div id="<?php echo ECWD_PLUGIN_PREFIX; ?>-display-options-wrap" class="ecwd-admin-fields">
   <div class="ecwd-add_organizer-container">
-    <a class="ecwd-add-organizer" href="#"><?php _e('Add organizer', 'ecwd'); ?></a>
+    <a class="ecwd-add-organizer" href="#"><?php _e('Add organizer', 'event-calendar-wd'); ?></a>
     <div class="ecwd-add-organizer-form" style="display: none">
       <div class="ecwd-organizer-meta-fields">
 
       <!-- start ecwd-add-organizer-title -->
       <div class="ecwd-meta-field">
-        <label for="ecwd-add-organizer-title">Title:<span style="color:#c60d0d"> *</span></label>
+        <label for="ecwd-add-organizer-title"><?php _e('Title','event-calendar-wd')?>:<span style="color:#c60d0d"> *</span></label>
         <input type="text" name="ecwd-add-organizer-title" id="ecwd-add-organizer-title"/>
       </div>
       <!-- end ecwd-add-organizer-title -->
 
       <!-- start ecwd-add-organizer-content -->
       <div class="ecwd-meta-field">
-        <label for="ecwd-add-organizer-content" style="vertical-align: top;">Description:</label>
+        <label for="ecwd-add-organizer-content" style="vertical-align: top;"><?php _e('Description','event-calendar-wd')?>:</label>
         <textarea name="ecwd-add-organizer-content" id="ecwd-add-organizer-content"></textarea>
       </div>
       <!-- end ecwd-add-organizer-content -->
 
       <!-- start ecwd_organizer_meta_phone -->
       <div class="ecwd-meta-field">
-        <label for="ecwd_organizer_meta_phone">Phone:</label>
+        <label for="ecwd_organizer_meta_phone"><?php _e('Phone','event-calendar-wd')?>:</label>
         <input type="text" name="ecwd_organizer_meta_phone" id="ecwd_organizer_meta_phone"/>
       </div>
       <!-- end ecwd_event_location -->
       <!-- start ecwd_venue_meta_phone -->
       <div class="ecwd-meta-field">
-        <label for="ecwd_organizer_meta_website">Website:</label>
+        <label for="ecwd_organizer_meta_website"><?php _e('Website','event-calendar-wd')?>:</label>
         <input type="text" name="ecwd_organizer_meta_website" id="ecwd_organizer_meta_website"/>
       </div>
         <div style="display: inline-block;">
         <button class="button button-primary button-large ecwd-add-organizer-save">
-          <?php _e('Save Organizer', 'ecwd'); ?>
+          <?php _e('Save Organizer', 'event-calendar-wd'); ?>
         </button>
         <span class="spinner"></span>
       </div>
@@ -79,7 +82,7 @@ if (!$event_organizers || $event_organizers == '' || !is_array($event_organizers
               echo 'checked="checked"';
             }
             ?> />
-            <?php echo $organizer_post->post_title; ?>
+            <?php echo esc_html($organizer_post->post_title); ?>
           </label>
         </p>
 

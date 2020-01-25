@@ -23,10 +23,32 @@ class ECWD {
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'), 5);
         add_action('wp_enqueue_scripts', array($this, 'enqueue_styles'));
         add_action('ecwd_show_related_events', array($this, 'show_related_events'), 10, 2);
+        add_action('init', array($this, 'register_hooks'));
+		// Elementor widget.
+		add_action('elementor/widgets/widgets_registered', array($this, 'register_elementor_widget'));
+		add_action('elementor/elements/categories_registered', array($this, 'register_elementor_widget_category'), 1, 1);
+      add_filter('tw_get_elementor_assets', array($this, 'register_elementor_assets'));
+      add_action('elementor/editor/after_enqueue_styles', array($this, 'enqueue_elementor_widget_styles'));
+      add_action('elementor/editor/after_enqueue_scripts', array($this, 'enqueue_elementor_widget_scripts'));
+
+    }
+
+    public function register_hooks(){
+      add_action('rest_api_init', array($this, 'init_rest_api'));
+    }
+
+    public function init_rest_api(){
+      require_once ECWD_DIR . '/includes/ecwd_class-rest-api.php';
+      EcwdRestApi::get_instance();
     }
 
     public function show_related_events($events, $upcoming_events = false) {
+
         global $ecwd_options;
+        if(!empty($events)) {
+          usort($events, array($this, 'order_events'));
+        }
+
         $today = date('Y-m-d');
         $date_format = 'Y-m-d';
         $time_format = 'H:i';
@@ -50,6 +72,13 @@ class ECWD {
         }
         $related_events_count -= 1;
         include_once 'views/related_events.php';
+    }
+
+    public function order_events($event1, $event2){
+      $sec_1 = strtotime($event1['from']);
+      $sec_2 = strtotime($event2['from']);
+
+      return strcmp($sec_1, $sec_2);
     }
 
     /**
@@ -77,9 +106,9 @@ class ECWD {
 
     public function add_localization() {
         $path = dirname(plugin_basename(__FILE__)) . '/languages/';
-        $loaded = load_plugin_textdomain('ecwd', false, $path);
+        $loaded = load_plugin_textdomain('event-calendar-wd', false, $path);
         if (isset($_GET['page']) && $_GET['page'] == basename(__FILE__) && !$loaded) {
-            echo '<div class="error">Event calendar WD ' . __('Could not load the localization file: ' . $path, 'ecwd') . '</div>';
+            echo '<div class="error">Event calendar WD ' . __('Could not load the localization file: ' . $path, 'event-calendar-wd') . '</div>';
 
             return;
         }
@@ -196,8 +225,8 @@ class ECWD {
         wp_localize_script(ECWD_PLUGIN_PREFIX . '-public', 'ecwd', array(
             'ajaxurl' => admin_url('admin-ajax.php'),
             'ajaxnonce' => wp_create_nonce(ECWD_PLUGIN_PREFIX . '_ajax_nonce'),
-            'loadingText' => __('Loading...', 'ecwd'),
-            'event_popup_title_text' => __('Event Details','ecwd'),
+            'loadingText' => __('Loading...', 'event-calendar-wd'),
+            'event_popup_title_text' => __('Event Details','event-calendar-wd'),
             'plugin_url' => ECWD_URL,
             'gmap_key'   => $gmap_key,
             'gmap_style' => (isset($ecwd_options['gmap_style'])) ? $ecwd_options['gmap_style'] : ""
@@ -305,7 +334,7 @@ class ECWD {
             if ($ecwd_event_date_to && date($date_format, strtotime($ecwd_event_date_from)) !== date($date_format, strtotime($ecwd_event_date_to))) {
                 $html .= ' - ' . date($date_format, strtotime($ecwd_event_date_to));
             }
-            $html .= ' ' . __('All day', 'ecwd');
+            $html .= ' ' . __('All day', 'event-calendar-wd');
 
             return $html;
         }
@@ -328,7 +357,7 @@ class ECWD {
             $html .= $ecwd_event_date_to_date . ' ' . $ecwd_event_date_to_time;
         }
         $html .= ECWD::get_time_zone( $ecwd_all_day_event );
-				
+
         return $html;
     }
 
@@ -340,7 +369,6 @@ class ECWD {
         if (null == self::$instance) {
             self::$instance = new self;
         }
-
         return self::$instance;
     }
 
@@ -362,4 +390,53 @@ class ECWD {
 			
 			return $timezone_str;
 		}
+
+    public static function reset_settings(){
+      if(isset($_POST['ecwd_reset_settings_nonce']) && wp_verify_nonce($_POST['ecwd_reset_settings_nonce'], 'ecwd_reset_settings')) {
+        if(isset($_POST['ecwd_reset_settings'])) {
+          delete_option($_POST['ecwd_reset_settings']);
+        }
+      }
+    }
+
+  /**
+	* Register widget for Elementor builder.
+	*/
+	function register_elementor_widget() {
+		if ( defined('ELEMENTOR_PATH') && class_exists('Elementor\Widget_Base') ) {
+			require_once (ECWD_DIR . '/includes/elementorWidget.php');
+		}
+	}
+
+	/**
+	* Register 10Web category for Elementor widget if 10Web builder doesn't installed.
+	*
+	* @param $elements_manager
+	*/
+	function register_elementor_widget_category( $elements_manager ) {
+		$elements_manager->add_category('tenweb-plugins-widgets', array(
+			'title' => __('10WEB Plugins', 'twbb'),
+			'icon' => 'fa fa-plug',
+		));
+	}
+
+  public function register_elementor_assets($assets) {
+    $version = '2.0.0';
+    if (!isset($assets['version']) || version_compare($assets['version'], $version) === -1) {
+      $assets['version'] = $version;
+      $assets['css_path'] = ECWD_URL . '/css/elementor_style.css';
+    }
+
+    return $assets;
+  }
+
+	function enqueue_elementor_widget_styles() {
+	  $key = 'twbb-editor-styles';
+    wp_deregister_style( $key );
+    $assets = apply_filters('tw_get_elementor_assets', array());
+    wp_enqueue_style($key, $assets['css_path'], array(), $assets['version']);
+	}
+  function enqueue_elementor_widget_scripts(){
+    wp_enqueue_script($this->prefix . 'elementor_widget_js', plugins_url('js/ecwd_elementor_widget.js', __FILE__), array('jquery'));
+  }
 }

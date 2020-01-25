@@ -3,6 +3,7 @@
  * Display for Event Custom Post Types
  */
 global $post;
+$single_event = $this->single_event_for_metas;
 
 $post_id = $post->ID;
 $type = ECWD_PLUGIN_PREFIX.'_calendar';
@@ -25,7 +26,7 @@ if(current_user_can('read_private_posts')) {
   }
 }
 
-$event_calendars = get_post_meta($post->ID, ECWD_PLUGIN_PREFIX.'_event_calendars', true);
+$event_calendars = $event_calendars = $single_event->calendars;
 if(!$event_calendars){
     $event_calendars = array();
 }
@@ -34,7 +35,7 @@ if(isset($_GET['cal_id']) && $_GET['cal_id']){
 }
 
 global $pagenow;
-if ($pagenow == "post-new.php") {
+if ($pagenow == "post-new.php" && empty($event_calendars)) {
     $ecwd_default_calendar = get_option('ecwd_default_calendar');
     if ($ecwd_default_calendar !== false && $ecwd_default_calendar !== null) {
         $event_calendars[] = $ecwd_default_calendar;
@@ -49,7 +50,7 @@ if ($pagenow == "post-new.php") {
                 <label for = "ecwd_event_calendar_<?php echo $calendar_post->ID; ?>" id = "ecwd_event_calendar_label_<?php echo $calendar_post->ID ?>">
                     <input type = "checkbox" name = "ecwd_event_calendars[]" id = "ecwd_event_calendar_<?php echo $calendar_post->ID; ?>" value = "<?php echo $calendar_post->ID; ?>" <?php if(in_array($calendar_post->ID, $event_calendars)){echo 'checked="checked"';}
                     ?> />
-                    <?php echo $calendar_post->post_title; ?>
+                    <?php echo esc_html($calendar_post->post_title); ?>
                 </label>
             </p>
 

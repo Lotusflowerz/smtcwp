@@ -40,11 +40,23 @@ global $ecwd_tabs;
 
 				?>
 
-				<?php submit_button(); ?>
+				<?php submit_button(null,'primary','submit',false); ?>
+                <a id="ecwd_reset_settings_button" href="#" class="button">Reset</a>
 
 			</form>
-		</div>
-		<!-- #ecwd-settings-content -->
+
+            <form method="post" id="ecwd_reset_settings_form">
+              <?php wp_nonce_field('ecwd_reset_settings', 'ecwd_reset_settings_nonce'); ?>
+                <input type="hidden" name="ecwd_reset_settings"
+                       value="<?php echo ECWD_PLUGIN_PREFIX . '_settings_' . $current_tab; ?>"/>
+            </form>
+        </div>
+        <div id="ecwd_past_event_list_popup" class="ecwd_past_event_list_popup mfp-hide">
+            <img class="ecwd_past_event_list_popup_loader" src="<?php echo ECWD_URL;?>/assets/loading.gif">
+            <button class="button button-primary button-large ecwd_delete_events ecwd_past_events_delete_button">Delete</button>
+        </div>
+        <!-- #ecwd-settings-content -->
+
 	</div>
 	<!-- #ecwd-settings -->
 </div><!-- .wrap -->

@@ -81,25 +81,25 @@ $max_date = date('Y-m-d', strtotime((date("Y-m-t", (strtotime(date('Y-m-d')))) .
 $events = $d->get_event_days($events, 1, date('Y-m-d'), $max_date);
 $events = $d->events_unique($events);
 
-$organizer_phone = get_post_meta($post_id, 'ecwd_organizer_meta_phone', true);
-$organizer_website = get_post_meta($post_id, 'ecwd_organizer_meta_website', true);
+$organizer_phone = esc_html(get_post_meta($post_id, 'ecwd_organizer_meta_phone', true));
+$organizer_website = esc_url(get_post_meta($post_id, 'ecwd_organizer_meta_website', true));
 $organizer_website = ECWD::add_http($organizer_website);
 
 $organizer_phone_html = $organizer_website_html = "";
 
 if (!empty($organizer_phone)) {
-  $organizer_phone_html = '<div class="%s"><span>' . __('Phone', 'ecwd') . ':</span><span>%s</span></div>';
+  $organizer_phone_html = '<div class="%s"><span>' . __('Phone', 'event-calendar-wd') . ':</span><span>%s</span></div>';
 }
 
 if (!empty($organizer_website)) {
-  $organizer_website_html = '<div class="%s"><span>' . __('Website', 'ecwd') . ':</span><a href="%s">%s</a></div>';
+  $organizer_website_html = '<div class="%s"><span>' . __('Website', 'event-calendar-wd') . ':</span><a href="%s">%s</a></div>';
 }
 ?>
 
 <div class="ecwd-organizer">
   <?php
   if (isset($_GET['organizer']) && intval($_GET['organizer']) == 1) {
-    echo '<a id="ecwd_back_link" href="#">' . __('Back', 'ecwd') . '</a>';
+    echo '<a id="ecwd_back_link" href="#">' . __('Back', 'event-calendar-wd') . '</a>';
     echo '<h3>' . $post->post_title . '</h3>';
   }
 
@@ -116,16 +116,16 @@ if (!empty($organizer_website)) {
   <?php if ($ecwd_social_icons) { ?>
     <div class="ecwd-social">
             <span class="share-links">
-                <a href="http://twitter.com/home?status=<?php echo get_permalink($post_id) ?>" class="ecwd-twitter"
+                <a href="https://twitter.com/home?status=<?php echo get_permalink($post_id) ?>" class="ecwd-twitter"
                    target="_blank" data-original-title="Tweet It">
                     <span class="visuallyhidden">Twitter</span></a>
 
-                <a href="http://www.facebook.com/sharer.php?u=<?php echo get_permalink($post_id) ?>"
+                <a href="https://www.facebook.com/sharer.php?u=<?php echo get_permalink($post_id) ?>"
                    class="ecwd-facebook"
                    target="_blank" data-original-title="Share on Facebook">
                     <span class="visuallyhidden">Facebook</span></a>
 
-                <a href="http://plus.google.com/share?url=<?php echo get_permalink($post_id) ?>"
+                <a href="https://plus.google.com/share?url=<?php echo get_permalink($post_id) ?>"
                    class="ecwd-google-plus"
                    target="_blank" data-original-title="Share on Google+">
                     <span class="visuallyhidden">Google+</span></a>

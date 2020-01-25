@@ -12,6 +12,7 @@ class ECWD_Cpt {
     protected static $instance = null;
     public $rewriteSlugSingular;
     public $rewriteSlug;
+    private $single_event_for_metas = null;
 
     private function __construct() {
         global $ecwd_options;
@@ -151,7 +152,7 @@ class ECWD_Cpt {
     public function duplicate_event_link($actions, $post) {
         if (current_user_can('edit_posts')) {
             if ($post->post_type == self::EVENT_POST_TYPE) {
-                $actions['duplicate'] = '<a href="admin.php?action=duplicate_ecwd_post&amp;post=' . $post->ID . '" title="Duplicate this event" rel="permalink">' . __('Duplicate Event', 'ecwd') . '</a>';
+                $actions['duplicate'] = '<a href="admin.php?action=duplicate_ecwd_post&amp;post=' . $post->ID . '" title="Duplicate this event" rel="permalink">' . __('Duplicate Event', 'event-calendar-wd') . '</a>';
             }
         }
 
@@ -262,11 +263,11 @@ class ECWD_Cpt {
             $this->rewriteSlug = ( isset($ecwd_options['events_slug']) && $ecwd_options['events_slug'] !== '' ) ? $ecwd_options['events_slug'] : $defaultSlug . 's';
             $this->rewriteSlugSingular = ( isset($ecwd_options['event_slug']) && $ecwd_options['event_slug'] !== '' ) ? $ecwd_options['event_slug'] : $defaultSlug;
             $rewrite = array(
-                'slug' => _x($this->rewriteSlugSingular, 'URL slug', 'ecwd'),
+                'slug' => _x($this->rewriteSlugSingular, 'URL slug', 'event-calendar-wd'),
                 "with_front" => true
             );
-            $venue_rewrite = array('slug' => _x('venue', 'URL slug', 'ecwd'), "with_front" => true);
-            $organizer_rewrite = array('slug' => _x('organizer', 'URL slug', 'ecwd'), "with_front" => true);
+            $venue_rewrite = array('slug' => _x('venue', 'URL slug', 'event-calendar-wd'), "with_front" => true);
+            $organizer_rewrite = array('slug' => _x('organizer', 'URL slug', 'event-calendar-wd'), "with_front" => true);
         }
 
 
@@ -275,18 +276,18 @@ class ECWD_Cpt {
         $show_events_tab = (get_option('ecwd_subscribe_done') === '1');
 
         $labels = array(
-          'name' => __('Events', 'ecwd'),
-          'singular_name' => __('Event', 'ecwd'),
-          'name_admin_bar' => __('Event', 'ecwd'),
-          'add_new' => __('Add New', 'ecwd'),
-          'add_new_item' => __('Add New Event', 'ecwd'),
-          'new_item' => __('New Event', 'ecwd'),
-          'edit_item' => __('Edit Event', 'ecwd'),
-          'view_item' => __('View Event', 'ecwd'),
-          'all_items' => __('Events', 'ecwd'),
-          'search_items' => __('Search Event', 'ecwd'),
-          'not_found' => __('No events found.', 'ecwd'),
-          'not_found_in_trash' => __('No events found in Trash.', 'ecwd')
+          'name' => __('Events', 'event-calendar-wd'),
+          'singular_name' => __('Event', 'event-calendar-wd'),
+          'name_admin_bar' => __('Event', 'event-calendar-wd'),
+          'add_new' => __('Add New Event', 'event-calendar-wd'),
+          'add_new_item' => __('Add New Event', 'event-calendar-wd'),
+          'new_item' => __('New Event', 'event-calendar-wd'),
+          'edit_item' => __('Edit Event', 'event-calendar-wd'),
+          'view_item' => __('View Event', 'event-calendar-wd'),
+          'all_items' => __('Events', 'event-calendar-wd'),
+          'search_items' => __('Search Event', 'event-calendar-wd'),
+          'not_found' => __('No events found.', 'event-calendar-wd'),
+          'not_found_in_trash' => __('No events found in Trash.', 'event-calendar-wd')
         );
 
         $args = array(
@@ -321,18 +322,18 @@ class ECWD_Cpt {
         /******************************** ORGANIZERS ********************************/
 
         $organizers_labels = array(
-          'name' => __('Organizers', 'ecwd'),
-          'singular_name' => __('Organizer', 'ecwd'),
-          'name_admin_bar' => __('Organizer', 'ecwd'),
-          'add_new' => __('Add New', 'ecwd'),
-          'add_new_item' => __('Add New Organizer', 'ecwd'),
-          'new_item' => __('New Organizer', 'ecwd'),
-          'edit_item' => __('Edit Organizer', 'ecwd'),
-          'view_item' => __('View Organizer', 'ecwd'),
-          'all_items' => __('Organizers', 'ecwd'),
-          'search_items' => __('Search Organizer', 'ecwd'),
-          'not_found' => __('No Organizers found.', 'ecwd'),
-          'not_found_in_trash' => __('No Organizers found in Trash.', 'ecwd')
+          'name' => __('Organizers', 'event-calendar-wd'),
+          'singular_name' => __('Organizer', 'event-calendar-wd'),
+          'name_admin_bar' => __('Organizer', 'event-calendar-wd'),
+          'add_new' => __('Add New', 'event-calendar-wd'),
+          'add_new_item' => __('Add New Organizer', 'event-calendar-wd'),
+          'new_item' => __('New Organizer', 'event-calendar-wd'),
+          'edit_item' => __('Edit Organizer', 'event-calendar-wd'),
+          'view_item' => __('View Organizer', 'event-calendar-wd'),
+          'all_items' => __('Organizers', 'event-calendar-wd'),
+          'search_items' => __('Search Organizer', 'event-calendar-wd'),
+          'not_found' => __('No Organizers found.', 'event-calendar-wd'),
+          'not_found_in_trash' => __('No Organizers found in Trash.', 'event-calendar-wd')
         );
 
         $organizers_args = array(
@@ -361,18 +362,18 @@ class ECWD_Cpt {
         /******************************** VENUES ********************************/
 
         $venues_labels = array(
-          'name' => __('Venues', 'ecwd'),
-          'singular_name' => __('Venue', 'ecwd'),
-          'name_admin_bar' => __('Venue', 'ecwd'),
-          'add_new' => __('Add New', 'ecwd'),
-          'add_new_item' => __('Add New Venue', 'ecwd'),
-          'new_item' => __('New Venue', 'ecwd'),
-          'edit_item' => __('Edit Venue', 'ecwd'),
-          'view_item' => __('View Venue', 'ecwd'),
-          'all_items' => __('Venues', 'ecwd'),
-          'search_items' => __('Search Venue', 'ecwd'),
-          'not_found' => __('No Venues found.', 'ecwd'),
-          'not_found_in_trash' => __('No Venues found in Trash.', 'ecwd')
+          'name' => __('Venues', 'event-calendar-wd'),
+          'singular_name' => __('Venue', 'event-calendar-wd'),
+          'name_admin_bar' => __('Venue', 'event-calendar-wd'),
+          'add_new' => __('Add New', 'event-calendar-wd'),
+          'add_new_item' => __('Add New Venue', 'event-calendar-wd'),
+          'new_item' => __('New Venue', 'event-calendar-wd'),
+          'edit_item' => __('Edit Venue', 'event-calendar-wd'),
+          'view_item' => __('View Venue', 'event-calendar-wd'),
+          'all_items' => __('Venues', 'event-calendar-wd'),
+          'search_items' => __('Search Venue', 'event-calendar-wd'),
+          'not_found' => __('No Venues found.', 'event-calendar-wd'),
+          'not_found_in_trash' => __('No Venues found in Trash.', 'event-calendar-wd')
         );
 
         $venues_args = array(
@@ -401,19 +402,19 @@ class ECWD_Cpt {
         /******************************** CALENDAR ********************************/
 
         $calendar_labels = array(
-          'name' => __('Calendars', 'ecwd'),
-          'singular_name' => __('Calendar', 'ecwd'),
-          'menu_name' => __('Calendars', 'ecwd'),
-          'name_admin_bar' => __('Calendar', 'ecwd'),
-          'add_new' => __('Add New Calendar', 'ecwd'),
-          'add_new_item' => __('Add New Calendar', 'ecwd'),
-          'new_item' => __('New Calendar', 'ecwd'),
-          'edit_item' => __('Edit Calendar', 'ecwd'),
-          'view_item' => __('View Calendar', 'ecwd'),
-          'all_items' => __('Calendars', 'ecwd'),
-          'search_items' => __('Search Calendar', 'ecwd'),
-          'not_found' => __('No Calendars found.', 'ecwd'),
-          'not_found_in_trash' => __('No Calendars found in Trash.', 'ecwd')
+          'name' => __('Calendars', 'event-calendar-wd'),
+          'singular_name' => __('Calendar', 'event-calendar-wd'),
+          'menu_name' => __('Calendars', 'event-calendar-wd'),
+          'name_admin_bar' => __('Calendar', 'event-calendar-wd'),
+          'add_new' => __('Add New Calendar', 'event-calendar-wd'),
+          'add_new_item' => __('Add New Calendar', 'event-calendar-wd'),
+          'new_item' => __('New Calendar', 'event-calendar-wd'),
+          'edit_item' => __('Edit Calendar', 'event-calendar-wd'),
+          'view_item' => __('View Calendar', 'event-calendar-wd'),
+          'all_items' => __('Calendars', 'event-calendar-wd'),
+          'search_items' => __('Search Calendar', 'event-calendar-wd'),
+          'not_found' => __('No Calendars found.', 'event-calendar-wd'),
+          'not_found_in_trash' => __('No Calendars found in Trash.', 'event-calendar-wd')
         );
 
         $calendar_args = array(
@@ -436,9 +437,6 @@ class ECWD_Cpt {
 
         register_post_type(self::CALENDAR_POST_TYPE, $calendar_args);
 
-        if ($ecwd_config['flush_rewrite_rules']['value'] == '1') {            
-            flush_rewrite_rules();
-        }
         if (false === get_option(ECWD_PLUGIN_PREFIX . '_cpt_setup') || 1 == get_option(ECWD_PLUGIN_PREFIX . '_slug_changed')) {
             update_option(ECWD_PLUGIN_PREFIX . '_cpt_setup', 1);
             update_option(ECWD_PLUGIN_PREFIX . '_slug_changed', 0);
@@ -516,17 +514,17 @@ class ECWD_Cpt {
         global $post, $post_ID;
 
         $url1 = '<a href="' . get_permalink($post_ID) . '">';
-        $url2 = __('calendar', 'ecwd');
+        $url2 = __('calendar', 'event-calendar-wd');
         $url3 = '</a>';
-        $s1 = __('Calendar', 'ecwd');
+        $s1 = __('Calendar', 'event-calendar-wd');
 
         $messages[ECWD_PLUGIN_PREFIX . '_calendar'] = array(
-            1 => sprintf(__('%4$s updated.', 'ecwd'), $url1, $url2, $url3, $s1),
-            4 => sprintf(__('%4$s updated. ', 'ecwd'), $url1, $url2, $url3, $s1),
-            6 => sprintf(__('%4$s published.', 'ecwd'), $url1, $url2, $url3, $s1),
-            7 => sprintf(__('%4$s saved.', 'ecwd'), $url1, $url2, $url3, $s1),
-            8 => sprintf(__('%4$s submitted. ', 'ecwd'), $url1, $url2, $url3, $s1),
-            10 => sprintf(__('%4$s draft updated.', 'ecwd'), $url1, $url2, $url3, $s1)
+            1 => sprintf(__('%4$s updated.', 'event-calendar-wd'), $url1, $url2, $url3, $s1),
+            4 => sprintf(__('%4$s updated. ', 'event-calendar-wd'), $url1, $url2, $url3, $s1),
+            6 => sprintf(__('%4$s published.', 'event-calendar-wd'), $url1, $url2, $url3, $s1),
+            7 => sprintf(__('%4$s saved.', 'event-calendar-wd'), $url1, $url2, $url3, $s1),
+            8 => sprintf(__('%4$s submitted. ', 'event-calendar-wd'), $url1, $url2, $url3, $s1),
+            10 => sprintf(__('%4$s draft updated.', 'event-calendar-wd'), $url1, $url2, $url3, $s1)
         );
         if ($post->post_type == ECWD_PLUGIN_PREFIX . '_calendar') {
 
@@ -557,17 +555,17 @@ class ECWD_Cpt {
         global $post, $post_ID;
 
         $url1 = '<a href="' . get_permalink($post_ID) . '">';
-        $url2 = __('Theme', 'ecwd');
+        $url2 = __('Theme', 'event-calendar-wd');
         $url3 = '</a>';
-        $s1 = __('Theme', 'ecwd');
+        $s1 = __('Theme', 'event-calendar-wd');
 
         $messages[ECWD_PLUGIN_PREFIX . '_theme'] = array(
-            1 => sprintf(__('%4$s updated.', 'ecwd'), $url1, $url2, $url3, $s1),
-            4 => sprintf(__('%4$s updated. ', 'ecwd'), $url1, $url2, $url3, $s1),
-            6 => sprintf(__('%4$s published.', 'ecwd'), $url1, $url2, $url3, $s1),
-            7 => sprintf(__('%4$s saved.', 'ecwd'), $url1, $url2, $url3, $s1),
-            8 => sprintf(__('%4$s submitted. ', 'ecwd'), $url1, $url2, $url3, $s1),
-            10 => sprintf(__('%4$s draft updated.', 'ecwd'), $url1, $url2, $url3, $s1)
+            1 => sprintf(__('%4$s updated.', 'event-calendar-wd'), $url1, $url2, $url3, $s1),
+            4 => sprintf(__('%4$s updated. ', 'event-calendar-wd'), $url1, $url2, $url3, $s1),
+            6 => sprintf(__('%4$s published.', 'event-calendar-wd'), $url1, $url2, $url3, $s1),
+            7 => sprintf(__('%4$s saved.', 'event-calendar-wd'), $url1, $url2, $url3, $s1),
+            8 => sprintf(__('%4$s submitted. ', 'event-calendar-wd'), $url1, $url2, $url3, $s1),
+            10 => sprintf(__('%4$s draft updated.', 'event-calendar-wd'), $url1, $url2, $url3, $s1)
         );
 
         if ($post->post_type == ECWD_PLUGIN_PREFIX . '_theme') {
@@ -607,17 +605,17 @@ class ECWD_Cpt {
         global $post, $post_ID;
 
         $url1 = '<a href="' . get_permalink($post_ID) . '">';
-        $url2 = __('event', 'ecwd');
+        $url2 = __('event', 'event-calendar-wd');
         $url3 = '</a>';
-        $s1 = __('Event', 'ecwd');
+        $s1 = __('Event', 'event-calendar-wd');
 
         $messages[ECWD_PLUGIN_PREFIX . '_event'] = array(
-            1 => sprintf(__('%4$s updated. %1$sView %2$s%3$s', 'ecwd'), $url1, $url2, $url3, $s1),
-            4 => sprintf(__('%4$s updated. %1$sView %2$s%3$s', 'ecwd'), $url1, $url2, $url3, $s1),
-            6 => sprintf(__('%4$s published. %1$sView %2$s%3$s', 'ecwd'), $url1, $url2, $url3, $s1),
-            7 => sprintf(__('%4$s saved. %1$sView %2$s%3$s', 'ecwd'), $url1, $url2, $url3, $s1),
-            8 => sprintf(__('%4$s submitted. %1$sView %2$s%3$s', 'ecwd'), $url1, $url2, $url3, $s1),
-            10 => sprintf(__('%4$s draft updated. %1$sView %2$s%3$s', 'ecwd'), $url1, $url2, $url3, $s1)
+            1 => sprintf(__('%4$s updated. %1$sView %2$s%3$s', 'event-calendar-wd'), $url1, $url2, $url3, $s1),
+            4 => sprintf(__('%4$s updated. %1$sView %2$s%3$s', 'event-calendar-wd'), $url1, $url2, $url3, $s1),
+            6 => sprintf(__('%4$s published. %1$sView %2$s%3$s', 'event-calendar-wd'), $url1, $url2, $url3, $s1),
+            7 => sprintf(__('%4$s saved. %1$sView %2$s%3$s', 'event-calendar-wd'), $url1, $url2, $url3, $s1),
+            8 => sprintf(__('%4$s submitted. %1$sView %2$s%3$s', 'event-calendar-wd'), $url1, $url2, $url3, $s1),
+            10 => sprintf(__('%4$s draft updated. %1$sView %2$s%3$s', 'event-calendar-wd'), $url1, $url2, $url3, $s1)
         );
 
         return $messages;
@@ -627,7 +625,7 @@ class ECWD_Cpt {
      * Add Events post meta
      */
     public function calendars_cpt_meta($screen = null, $context = 'advanced') {
-        add_meta_box(ECWD_PLUGIN_PREFIX . '_calendar_meta', __('Calendar Settings', 'ecwd'), array(
+        add_meta_box(ECWD_PLUGIN_PREFIX . '_calendar_meta', __('Calendar Settings', 'event-calendar-wd'), array(
             $this,
             'display_calendars_meta'
                 ), ECWD_PLUGIN_PREFIX . '_calendar', 'normal', 'high');
@@ -717,29 +715,41 @@ class ECWD_Cpt {
      * Add Events post meta
      */
     public function events_cpt_meta($screen = null, $context = 'advanced') {
-        add_meta_box(ECWD_PLUGIN_PREFIX . '_event_meta', __('Event Details', 'ecwd'), array(
+
+      global $post;
+      if(!empty($post->post_type) && $post->post_type === "ecwd_event"){
+        include_once 'events/ecwd-single-event.php';
+        $this->single_event_for_metas = new ecwd_single_event($post->ID, $post->title, $post->post_title, $post->post_content);
+        $this->single_event_for_metas->post = $post;
+        $this->single_event_for_metas->set_metas();
+      }
+
+
+      add_meta_box(ECWD_PLUGIN_PREFIX . '_event_meta', __('Event Details', 'event-calendar-wd'), array(
           $this,
           'display_events_meta'
         ), ECWD_PLUGIN_PREFIX . '_event', 'normal', 'high');
 
-        add_meta_box(ECWD_PLUGIN_PREFIX . '_event_calendars_meta', __('Calendars', 'ecwd'), array(
+        add_meta_box(ECWD_PLUGIN_PREFIX . '_event_calendars_meta', __('Calendars', 'event-calendar-wd'), array(
             $this,
             'display_events_calendars_meta'
                 ), ECWD_PLUGIN_PREFIX . '_event', 'normal', 'high');
 
-        add_meta_box(ECWD_PLUGIN_PREFIX . '_event_venue_meta', __('Venue', 'ecwd'), array(
+        add_meta_box(ECWD_PLUGIN_PREFIX . '_event_venue_meta', __('Venue', 'event-calendar-wd'), array(
           $this,
           'display_events_venue_meta'
         ), ECWD_PLUGIN_PREFIX . '_event', 'normal', 'high');
 
-        add_meta_box(ECWD_PLUGIN_PREFIX . '_event_organizers_meta', __('Organizers', 'ecwd'), array(
+        add_meta_box(ECWD_PLUGIN_PREFIX . '_event_organizers_meta', __('Organizers', 'event-calendar-wd'), array(
             $this,
             'display_events_organizers_meta'
                 ), ECWD_PLUGIN_PREFIX . '_event', 'normal', 'high');
 
-        if (current_theme_supports('post-thumbnails', 'post') && post_type_supports('post', 'thumbnail')) {
-            add_meta_box('postimagediv', __('Featured Image'), 'post_thumbnail_meta_box', null, 'side', 'low');
-        }
+      global $post;
+      $post_type = get_post_type($post);
+      if ((self::EVENT_POST_TYPE === $post_type || self::ORGANIZER_POST_TYPE === $post_type || self::VENUE_POST_TYPE === $post_type || self::CALENDAR_POST_TYPE === $post_type || ECWD_PLUGIN_PREFIX . '_theme' === $post_type) && current_theme_supports('post-thumbnails', 'post') && post_type_supports('post', 'thumbnail')) {
+        add_meta_box('postimagediv', __('Featured Image'), 'post_thumbnail_meta_box', null, 'side', 'low');
+      }
     }
 
     /**
@@ -769,7 +779,7 @@ class ECWD_Cpt {
      * Add Themes post meta
      */
     public function themes_cpt_meta() {
-        add_meta_box(ECWD_PLUGIN_PREFIX . '_theme_meta', __('Calendar Theme Settings', 'ecwd'), array(
+        add_meta_box(ECWD_PLUGIN_PREFIX . '_theme_meta', __('Calendar Theme Settings', 'event-calendar-wd'), array(
             $this,
             'display_theme_meta'
                 ), ECWD_PLUGIN_PREFIX . '_theme', 'normal', 'high');
@@ -874,7 +884,7 @@ class ECWD_Cpt {
 
         add_meta_box(
           ECWD_PLUGIN_PREFIX . '_venue_meta',
-          __('Venue Details', 'ecwd'),
+          __('Venue Details', 'event-calendar-wd'),
           array($this, 'display_venue_meta'),
           ECWD_PLUGIN_PREFIX . '_venue',
           'normal',
@@ -887,7 +897,7 @@ class ECWD_Cpt {
     public function organizers_cpt_meta() {
         add_meta_box(
           ECWD_PLUGIN_PREFIX . '_organizer_meta',
-          __('Organizer Details', 'ecwd'),
+          __('Organizer Details', 'event-calendar-wd'),
           array($this, 'display_organizer_meta'),
           ECWD_PLUGIN_PREFIX . '_organizer',
           'normal',
@@ -916,7 +926,12 @@ class ECWD_Cpt {
     //order orgs and venues by post name
     function ecwd_archive_order($vars) {
         global $ecwd_options;
-        $orderby = isset($ecwd_options['cpt_order']) ? $ecwd_options['cpt_order'] : 'post_name';
+        if(isset($ecwd_options['cpt_order']) && $ecwd_options['cpt_order'] !== 'post_name'){
+			$orderby = $ecwd_options['cpt_order'];
+		}else{
+			$orderby = 'post_title';
+		}
+
         $types = array(self::ORGANIZER_POST_TYPE, self::VENUE_POST_TYPE);
         if (!is_admin() && isset($vars['post_type']) && is_post_type_hierarchical($vars['post_type']) && in_array($vars['post_type'], $types)) {
             $vars['orderby'] = $orderby;
@@ -959,7 +974,8 @@ class ECWD_Cpt {
             $calendar_id = esc_attr($_POST[ECWD_PLUGIN_PREFIX . '_calendar_id']);
             $new_event = array(
                 'post_type' => ECWD_PLUGIN_PREFIX . '_event',
-                'post_title' => esc_attr($_POST[ECWD_PLUGIN_PREFIX . '_event_name'])
+                'post_title' => esc_attr($_POST[ECWD_PLUGIN_PREFIX . '_event_name']),
+				'post_status'   => 'publish'
             );
             $new_event_id = wp_insert_post($new_event);
             if ($new_event_id) {
@@ -979,7 +995,7 @@ class ECWD_Cpt {
     /**
      * Function to save post meta for the event CPT
      */
-    public function save_meta($post_id, $post) {
+    public function save_meta($post_id, $post, $post_before) {
         if (( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) || ( defined('DOING_AJAX') && DOING_AJAX )) {
             return $post_id;
         }
@@ -990,7 +1006,12 @@ class ECWD_Cpt {
             return $post_id;
         }
 
-        $types = array(
+        if($post->post_status === "trash" || $post_before->post_status === "trash"){
+            return $post_id;
+        }
+
+
+      $types = array(
             ECWD_PLUGIN_PREFIX . '_calendar',
             ECWD_PLUGIN_PREFIX . '_event',
             ECWD_PLUGIN_PREFIX . '_theme',
@@ -1021,8 +1042,6 @@ class ECWD_Cpt {
                 $_POST['ecwd_event_show_map'] = get_post_meta($_POST['ecwd_event_venue'], 'ecwd_venue_show_map', true);
                 $_POST['ecwd_map_zoom'] = get_post_meta($_POST['ecwd_event_venue'], 'ecwd_map_zoom', true);
             }
-        }else if($post_type == 'ecwd_calendar'){
-            $this->save_default_calendar_meta($post_id);
         }
 
 
@@ -1168,7 +1187,9 @@ class ECWD_Cpt {
                 $values = array();
                 $data = json_encode($values);
                 update_post_meta($post_id, $post_type . '_params', $data);
-            } else {
+            } if ($post_type == ECWD_PLUGIN_PREFIX . '_event') {
+              $this->save_event_metas($post_id);
+            }else {
                 foreach ($ecwd_post_meta_fields[$post_type] as $pmf) {
                     if (isset($_POST[$pmf]) && !empty($_POST[$pmf])) {
                         if ($post_type == ECWD_PLUGIN_PREFIX . '_calendar') {
@@ -1202,6 +1223,32 @@ class ECWD_Cpt {
         return $post_id;
     }
 
+    private function save_event_metas($post_id){
+      include_once 'events/ecwd-single-event.php';
+      include_once 'events/ecwd-events-controller.php';
+
+      $event = new ecwd_single_event($post_id);
+      $event->set_start_date(str_ireplace(array(" pm"," am"),array("pm","am"),$_POST['ecwd_event_date_from']));
+      $event->set_end_date(str_ireplace(array(" pm"," am"),array("pm","am"),$_POST['ecwd_event_date_to']));
+
+      if((isset($_POST['ecwd_all_day_event'])) && $_POST['ecwd_all_day_event'] === '1') {
+        $event->set_all_day(true);
+      } else {
+        $event->set_all_day(false);
+      }
+
+      $event->calendars = !empty($_POST['ecwd_event_calendars']) ? $_POST['ecwd_event_calendars'] : array();
+      $event->set_venue($_POST['ecwd_event_venue']);
+      $event->organizers = !empty($_POST['ecwd_event_organizers']) ? $_POST['ecwd_event_organizers'] : array();
+      $event->event_url = $_POST['ecwd_event_url'];
+      $event->video_url = $_POST['ecwd_event_video'];
+      $event->set_repeat();
+
+      $event_controller = new ecwd_events_controller();
+      $event_controller->update_meta_values($event);
+
+    }
+
     public function error_messages($m) {
         global $post;
 
@@ -1212,8 +1259,9 @@ class ECWD_Cpt {
 
         $new_columns = array(
             'cb' => $defaults['cb'],
-            'calendar-id' => __('Calendar ID', 'ecwd'),
-            'calendar-sc' => __('Calendar Shortcode', 'ecwd'),
+            'calendar-id' => __('Calendar ID', 'event-calendar-wd'),
+            'calendar-sc' => __('Calendar Shortcode', 'event-calendar-wd'),
+            'calendar-dc' => __('Default Calendar', 'event-calendar-wd'),
         );
 
         return array_merge($defaults, $new_columns);
@@ -1223,7 +1271,7 @@ class ECWD_Cpt {
 
         $new_columns = array(
             'cb' => $defaults['cb'],
-            'event-id' => __('Event Dates', 'ecwd')
+            'event-id' => __('Event Dates', 'event-calendar-wd')
         );
 
         return array_merge($defaults, $new_columns);
@@ -1233,7 +1281,7 @@ class ECWD_Cpt {
      * Fill out the calendar columns
      */
     public function calendar_column_content($column_name, $post_ID) {
-
+        $default_id = get_option("ecwd_default_calendar");
         switch ($column_name) {
 
             case 'calendar-id':
@@ -1241,6 +1289,9 @@ class ECWD_Cpt {
                 break;
             case 'calendar-sc':
                 echo '<code>[ecwd id="' . $post_ID . '"]</code>';
+                break;
+            case 'calendar-dc':
+                echo '<input id="ecwd_set_default_'.$post_ID.'" data-calendar_id="'.$post_ID.'" type="radio" '. ( $post_ID == $default_id ? ' checked="checked"' : ''). '  name="ecwd_set_default">';
                 break;
         }
     }
@@ -1269,17 +1320,17 @@ class ECWD_Cpt {
         $slug = (isset($ecwd_options['category_archive_slug']) && $ecwd_options['category_archive_slug'] != "") ? $ecwd_options['category_archive_slug'] : 'event_category';
 
         $labels = array(
-            'name' => _x('Event Categories', 'taxonomy general name', 'ecwd'),
-            'singular_name' => _x('Event Category', 'taxonomy singular name', 'ecwd'),
-            'search_items' => __('Search Event Categories', 'ecwd'),
-            'all_items' => __('All Event Categories', 'ecwd'),
-            'parent_item' => __('Parent Category', 'ecwd'),
-            'parent_item_colon' => __('Parent Category:', 'ecwd'),
-            'edit_item' => __('Edit Category', 'ecwd'),
-            'update_item' => __('Update Category', 'ecwd'),
-            'add_new_item' => __('Add New Event Category', 'ecwd'),
-            'new_item_name' => __('New Event Category Name', 'ecwd'),
-            'menu_name' => __('Event Categories', 'ecwd'),
+            'name' => _x('Event Categories', 'taxonomy general name', 'event-calendar-wd'),
+            'singular_name' => _x('Event Category', 'taxonomy singular name', 'event-calendar-wd'),
+            'search_items' => __('Search Event Categories', 'event-calendar-wd'),
+            'all_items' => __('All Event Categories', 'event-calendar-wd'),
+            'parent_item' => __('Parent Category', 'event-calendar-wd'),
+            'parent_item_colon' => __('Parent Category:', 'event-calendar-wd'),
+            'edit_item' => __('Edit Category', 'event-calendar-wd'),
+            'update_item' => __('Update Category', 'event-calendar-wd'),
+            'add_new_item' => __('Add New Event Category', 'event-calendar-wd'),
+            'new_item_name' => __('New Event Category Name', 'event-calendar-wd'),
+            'menu_name' => __('Event Categories', 'event-calendar-wd'),
         );
 
         $args = array(
@@ -1296,14 +1347,24 @@ class ECWD_Cpt {
         register_taxonomy(
                 ECWD_PLUGIN_PREFIX . '_event_tag', ECWD_PLUGIN_PREFIX . '_event', array(
             'hierarchical' => false,
-            'label' => __('Event Tags', 'ecwd'),
-            'singular_name' => __('Event Tag', 'ecwd'),
+            'label' => __('Event Tags', 'event-calendar-wd'),
+            'singular_name' => __('Event Tag', 'event-calendar-wd'),
             'rewrite' => array('slug' => 'event_tag'),
             'query_var' => true
                 )
         );
+      add_action( 'pre_get_posts', array($this,'ecwd_pre_get_posts' ));
     }
 
+  public function ecwd_pre_get_posts($query) {
+    if(is_archive()){
+      if ($query->get('post_type') === 'nav_menu_item') {
+        $query->set( 'tax_query', '' );
+        $query->set( 'meta_key', '' );
+        $query->set( 'orderby', '' );
+      }
+    }
+  }
     /*
      * Add metas to events categories
      *
@@ -1376,8 +1437,8 @@ class ECWD_Cpt {
     public function taxonomy_columns($columns) {
         $new_columns = array();
         $new_columns['cb'] = $columns['cb'];
-        $new_columns['thumb'] = __('Icon', 'ecwd');
-        $new_columns['color'] = __('Color', 'ecwd');
+        $new_columns['thumb'] = __('Icon', 'event-calendar-wd');
+        $new_columns['color'] = __('Color', 'event-calendar-wd');
 
         unset($columns['cb']);
 
@@ -1394,7 +1455,7 @@ class ECWD_Cpt {
         }
         if ($column == 'thumb') {
             $term_meta[ECWD_PLUGIN_PREFIX . '_taxonomy_image'] = $this->get_image_url($term_meta[ECWD_PLUGIN_PREFIX . '_taxonomy_image']);
-            $columns = '<div><img src="' . $this->get_image_url($term_meta[ECWD_PLUGIN_PREFIX . '_taxonomy_image'], null, true) . '" alt="' . __('Icon', 'ecwd') . '" class="wp-post-image ecwd_icon" /></div>';
+            $columns = '<div><img src="' . $this->get_image_url($term_meta[ECWD_PLUGIN_PREFIX . '_taxonomy_image'], null, true) . '" alt="' . __('Icon', 'event-calendar-wd') . '" class="wp-post-image ecwd_icon" /></div>';
         }
         if ($column == 'color') {
             $columns .= '<div><div style="width: 10px; height: 10px; background-color: ' . $term_meta['color'] . '" ></div></div>';
@@ -1429,8 +1490,9 @@ class ECWD_Cpt {
     }
 
     public function ecwd_templates($template) {
+		global $ecwd_options;
         $post_types = array(self::EVENT_POST_TYPE);
-        if (is_singular($post_types) && !file_exists(get_stylesheet_directory() . '/single-event.php')) {
+        if (is_singular($post_types) && !file_exists(get_stylesheet_directory() . '/single-event.php') && (isset($ecwd_options['use_custom_template']) && $ecwd_options['use_custom_template'] == '1')) {
             $template = ECWD_DIR . '/views/single-event.php';
         } elseif (is_tax('ecwd_event_category')) {
             global $ecwd_options;
@@ -1442,27 +1504,6 @@ class ECWD_Cpt {
         return $template;
     }
 
-    private function save_default_calendar_meta($post_id){
-
-        $is_default_calendar = get_post_meta($post_id, 'ecwd_default_calendar', true);
-        $is_default_calendar = ($is_default_calendar == '1');
-
-        $set_default_calendar = (isset($_POST['ecwd_default_calendar']) && $_POST['ecwd_default_calendar'] == '1');
-
-
-        if ($is_default_calendar === true && $set_default_calendar === false) {
-            delete_post_meta($post_id, 'ecwd_default_calendar');
-            delete_option('ecwd_default_calendar');
-        } else if ($is_default_calendar === false && $set_default_calendar === true) {
-            $default_calendar_id = get_option('ecwd_default_calendar');
-            if($default_calendar_id !== false && $default_calendar_id !== ""){
-                delete_post_meta($default_calendar_id, 'ecwd_default_calendar');
-            }
-            update_post_meta($post_id, 'ecwd_default_calendar', '1');
-            update_option('ecwd_default_calendar', $post_id);
-        }
-
-    }
 
 
     public static function add_new_venue($post_data=null) {
@@ -1530,7 +1571,7 @@ class ECWD_Cpt {
 
     public function events_archive_page_query($query) {
         if (is_archive() && !is_admin()) {
-            if (isset($query->query_vars['post_type']) && $query->query_vars['post_type'] == 'ecwd_event') {
+          if ((isset($query->query_vars['post_type']) && $query->query_vars['post_type'] == 'ecwd_event') || is_tax('ecwd_event_category') || is_tax('ecwd_event_tag')) {
                 global $ecwd_options;
                 $query->set('meta_key', 'ecwd_event_date_from');
                 $query->set('orderby', 'meta_value');
@@ -1548,7 +1589,7 @@ class ECWD_Cpt {
         $cleared = $this->delete_transient();
         if ($cleared) {
             try {
-                echo '<div class= "updated" ><p> ' . __('Cache has been deleted.', 'ecwd') . '</p></div>';
+                echo '<div class= "updated" ><p> ' . __('Cache has been deleted.', 'event-calendar-wd') . '</p></div>';
             } catch (Exception $e) {
 
             }

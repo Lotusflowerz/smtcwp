@@ -36,8 +36,21 @@ if (isset($ecwd_options['social_icons']) && $ecwd_options['social_icons'] != '')
 
 $ecwd_event = $post;
 $ecwd_event_metas = get_post_meta($ecwd_event->ID, '', true);
-$ecwd_event_date_from = $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_date_from'][0];
-$ecwd_event_date_to = $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_date_to'][0];
+
+if(isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_date_from'][0])) {
+  $ecwd_event_date_from = $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_date_from'][0];
+  $ecwd_event_date_to = $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_date_to'][0];
+
+  $is_default_dates = false;
+}else{
+  $today = date('Y-m-d H:i');
+
+  $ecwd_event_date_from = date('Y/m/d H:i', strtotime($today . "+1 days"));
+  $ecwd_event_date_to = date('Y/m/d H:i', strtotime($ecwd_event_date_from . "+1 hour"));
+
+  $is_default_dates = true;
+}
+
 if (!isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_url'])) {
   $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_url'] = array(0 => '');
 }
@@ -70,41 +83,46 @@ if (isset($_GET['eventDate']) || isset($wp_query->query_vars['eventDate'])) {
 }
 
 
-$ecwd_event_location = isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_location'][0]) ? $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_location'][0] : '';
-$ecwd_event_latlong = isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_lat_long'][0]) ? $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_lat_long'][0] : '';
-$ecwd_event_zoom = isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_map_zoom'][0]) ? $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_map_zoom'][0] : '';
-$ecwd_event_show_map = isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_show_map'][0]) ? $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_show_map'][0] : 0;
+$ecwd_event_location = isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_location'][0]) ? esc_html($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_location'][0]) : '';
+$ecwd_event_latlong = isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_lat_long'][0]) ? esc_html($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_lat_long'][0]) : '';
+//$ecwd_event_zoom = isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_map_zoom'][0]) ? $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_map_zoom'][0] : '';
+$ecwd_event_show_map = isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_show_map'][0]) ? esc_html($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_show_map'][0]) : 0;
 if ($ecwd_event_show_map == '') {
   $ecwd_event_show_map = 1;
 }
-if (!$ecwd_event_zoom) {
-  $ecwd_event_zoom = 17;
-}
-
-$ecwd_event_organizers = isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_organizers'][0]) ? $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_organizers'][0] : '';
 
 
-$ecwd_event_url = isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_url'][0]) ? $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_url'][0] : '';
+$ecwd_event_organizers = isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_organizers'][0]) ? esc_html($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_organizers'][0]) : '';
+
+
+$ecwd_event_url = isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_url'][0]) ? esc_url($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_url'][0]) : '';
 $ecwd_event_url = ECWD::add_http($ecwd_event_url);
-$ecwd_event_video = isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_video'][0]) ? $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_video'][0] : '';
-$ecwd_all_day_event = isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_all_day_event'][0]) ? $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_all_day_event'][0] : 0;
+$ecwd_event_video = isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_video'][0]) ? esc_html($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_video'][0]) : '';
+$ecwd_all_day_event = isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_all_day_event'][0]) ? esc_html($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_all_day_event'][0]) : 0;
 $venue = '';
 $venue_permalink = '';
 $venue_post_id = isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_venue'][0]) ? $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_venue'][0] : 0;
+
+$ecwd_event_zoom = "";
 if ($venue_post_id) {
   $venue_post = get_post($venue_post_id);
   if ($venue_post) {
     $venue = $venue_post->post_title;
     $venue_permalink = get_permalink($venue_post->ID);
+    $ecwd_event_zoom = get_post_meta($venue_post->ID, 'ecwd_map_zoom', true);
   }
+}
+
+if (!$ecwd_event_zoom) {
+  $ecwd_event_zoom = 17;
 }
 
 $venue_meta_template = '<div class="%s"><span>%s:</span><span>%s</span></div>';
 $venue_meta_link_template = '<div class="%s"><span>%s:</span><a href="%s">%s</a></div>';
 
 if (is_numeric($venue_post_id)) {
-  $ecwd_venue_phone = get_post_meta($venue_post_id, 'ecwd_venue_meta_phone', true);
-  $ecwd_venue_website = get_post_meta($venue_post_id, 'ecwd_venue_meta_website', true);
+  $ecwd_venue_phone = esc_html(get_post_meta($venue_post_id, 'ecwd_venue_meta_phone', true));
+  $ecwd_venue_website = esc_url(get_post_meta($venue_post_id, 'ecwd_venue_meta_website', true));
   $ecwd_venue_website = ECWD::add_http($ecwd_venue_website);
 } else {
   $ecwd_venue_phone = $ecwd_venue_website = "";
@@ -152,22 +170,6 @@ if (isset($ecwd_options['cat_title_color']) && $ecwd_options['cat_title_color'] 
 
 $default_calendar = get_option('ecwd_default_calendar');
 $calendars_id = get_post_meta($post_id, 'ecwd_event_calendars', true);
-$back_link = null;
-$back_link_text = __('View Calendar', 'ecwd');
-if (!empty($calendars_id)) {
-  if ($default_calendar !== false && in_array($default_calendar, $calendars_id)) {
-    $back_link = get_permalink($default_calendar);
-  } else {
-    $back_link = get_permalink(array_shift($calendars_id));
-  }
-} else {
-  if (isset($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER']) {
-    if (parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST) == parse_url(site_url(), PHP_URL_HOST)) {
-      $back_link = $_SERVER['HTTP_REFERER'];
-      $back_link_text = __('Back', 'ecwd');
-    }
-  }
-}
 
 get_header();
 if ( class_exists( 'WooCommerce' ) ) {
@@ -185,214 +187,213 @@ if ( class_exists( 'WooCommerce' ) ) {
           <header class="entry-header">
             <?php the_title('<h1 itemprop="name" class="ecwd-events-single-event-title summary entry-title" ' . $event_title_style . '>', '</h1>'); ?>
           </header>
-          <?php if ($back_link !== null) { ?>
-            <a id="ecwd_back_link" href="<?php echo $back_link; ?>"><?php echo $back_link_text; ?></a>
-          <?php } ?>
-          <div class="event-detalis">
-            <?php if ($featured_image && $featured_image !== '') { ?>
-              <div class="event-featured-image">
-                <img src="<?php echo $featured_image; ?>"/>
-              </div>
-            <?php } ?>
-            <div class="ecwd-event-details">
-              <div class="event-detalis-date">
-                <label class="ecwd-event-date-info" title="<?php _e('Date', 'ecwd'); ?>"></label>
-                <span
-                  class="ecwd-event-date"
-                  itemprop="startDate"
-                  content="<?php echo date('Y-m-d', strtotime($ecwd_event_date_from)) . 'T' . date('H:i', strtotime($ecwd_event_date_from)) ?>">
-                 <?php echo ECWD::get_ecwd_event_date_view($ecwd_event_date_from, $ecwd_event_date_to, $ecwd_all_day_event); ?>
-                </span>
-              </div>
+		  <?php if ( ! post_password_required() ) ?>
+			  <div class="event-detalis">
+				<?php if ($featured_image && $featured_image !== '') { ?>
+				  <div class="event-featured-image">
+					<img src="<?php echo $featured_image; ?>"/>
+				  </div>
+				<?php } ?>
+				<div class="ecwd-event-details">
+				  <div class="event-detalis-date">
+					<label class="ecwd-event-date-info" title="<?php _e('Date', 'event-calendar-wd'); ?>"></label>
+					<span
+					  class="ecwd-event-date"
+					  itemprop="startDate"
+					  content="<?php echo date('Y-m-d', strtotime($ecwd_event_date_from)) . 'T' . date('H:i', strtotime($ecwd_event_date_from)) ?>">
+					 <?php echo ECWD::get_ecwd_event_date_view($ecwd_event_date_from, $ecwd_event_date_to, $ecwd_all_day_event); ?>
+					</span>
+				  </div>
 
-              <?php
-              if (isset($ecwd_options['show_repeat_rate'])) {
-                $repeat_rate_text = $d->get_repeat_rate($post_id, '', $date_format);
-                if ($repeat_rate_text != ''):
-                  ?>
-                  <div class="ecwd_repeat_rate_text">
-                    <span><?php echo $d->get_repeat_rate($post_id, '', $date_format); ?></span>
-                  </div>
-                  <?php
-                endif;
-              } ?>
+				  <?php
+				  if (isset($ecwd_options['show_repeat_rate']) && !$is_default_dates) {
+					$repeat_rate_text = $d->get_repeat_rate($post_id, '', $date_format);
+					if ($repeat_rate_text != ''):
+					  ?>
+					  <div class="ecwd_repeat_rate_text">
+						<span><?php echo $d->get_repeat_rate($post_id, '', $date_format); ?></span>
+					  </div>
+					  <?php
+					endif;
+				  } ?>
 
-              <?php if ($ecwd_event_url) { ?>
-                <div class="ecwd-url">
-                  <a href="<?php echo $ecwd_event_url; ?>" target="_blank">
-                    <label class="ecwd-event-url-info" title="<?php _e('Url', 'ecwd'); ?>"></label>
-                    <?php echo $ecwd_event_url; ?>
-                  </a>
-                </div>
-              <?php }
+				  <?php if ($ecwd_event_url) { ?>
+					<div class="ecwd-url">
+					  <a href="<?php echo $ecwd_event_url; ?>" target="_blank">
+						<label class="ecwd-event-url-info" title="<?php _e('Url', 'event-calendar-wd'); ?>"></label>
+						<?php echo $ecwd_event_url; ?>
+					  </a>
+					</div>
+				  <?php }
 
-              if (count($organizers) > 0) { ?>
-                <div class="event-detalis-org">
-                  <label class="ecwd-event-org-info" title="<?php _e('Organizers', 'ecwd'); ?>"></label>
+				  if (count($organizers) > 0) { ?>
+					<div class="event-detalis-org">
+					  <label class="ecwd-event-org-info" title="<?php _e('Organizers', 'event-calendar-wd'); ?>"></label>
 
-                  <?php if (count($organizers) > 1) { ?>
-                    <?php foreach ($organizers as $organizer) { ?>
-                      <span itemprop="organizer">
-                      <a href="<?php echo get_permalink($organizer['ID']) ?>">
-                        <?php echo $organizer['post_title'] ?>
-                       </a>
-                    </span>
+					  <?php if (count($organizers) > 1) { ?>
+						<?php foreach ($organizers as $organizer) { ?>
+						  <span itemprop="organizer">
+						  <a href="<?php echo get_permalink($organizer['ID']) ?>">
+							<?php echo $organizer['post_title'] ?>
+						   </a>
+						</span>
 
-                    <?php }
-                  } else {
-                    $organizer = $organizers[0];
-                    ?>
+						<?php }
+					  } else {
+						$organizer = $organizers[0];
+						?>
 
-                    <span itemprop="organizer">
-                      <a href="<?php echo get_permalink($organizer['ID']) ?>">
-                        <?php echo $organizer['post_title'] ?>
-                       </a>
-                    </span>
+						<span itemprop="organizer">
+						  <a href="<?php echo get_permalink($organizer['ID']) ?>">
+							<?php echo $organizer['post_title'] ?>
+						   </a>
+						</span>
 
-                    <?php
-                    $organizer_phone = get_post_meta($organizer['ID'], 'ecwd_organizer_meta_phone', true);
-                    $organizer_website = get_post_meta($organizer['ID'], 'ecwd_organizer_meta_website', true);
-                    $organizer_website = ECWD::add_http($organizer_website);
+						<?php
+						$organizer_phone = esc_html(get_post_meta($organizer['ID'], 'ecwd_organizer_meta_phone', true));
+						$organizer_website = esc_url(get_post_meta($organizer['ID'], 'ecwd_organizer_meta_website', true));
+						$organizer_website = ECWD::add_http($organizer_website);
 
-                    if (!empty($organizer_phone)) { ?>
-                      <div class="ecwd_organizer_phone">
-                        <span><?php _e('Phone', 'ecwd'); ?>:</span>
-                        <span><?php echo $organizer_phone; ?></span>
-                      </div>
-                    <?php }
-                    if (!empty($organizer_website)) { ?>
-                      <div class="ecwd_organizer_website">
-                        <span><?php _e('Website', 'ecwd'); ?>:</span>
-                        <a href="<?php echo $organizer_website; ?>">
-                          <?php echo $organizer_website; ?>
-                        </a>
-                      </div>
-                    <?php }
-                  } ?>
-                </div>
-              <?php } ?>
+						if (!empty($organizer_phone)) { ?>
+						  <div class="ecwd_organizer_phone">
+							<span><?php _e('Phone', 'event-calendar-wd'); ?>:</span>
+							<span><?php echo $organizer_phone; ?></span>
+						  </div>
+						<?php }
+						if (!empty($organizer_website)) { ?>
+						  <div class="ecwd_organizer_website">
+							<span><?php _e('Website', 'event-calendar-wd'); ?>:</span>
+							<a href="<?php echo $organizer_website; ?>">
+							  <?php echo $organizer_website; ?>
+							</a>
+						  </div>
+						<?php }
+					  } ?>
+					</div>
+				  <?php } ?>
 
-              <div class="event-venue" itemprop="location" itemscope itemtype="http://schema.org/Place">
-                <?php if ($venue_post_id) { ?>
-                  <label class="ecwd-venue-info" title="<?php _e('Venue', 'ecwd'); ?>"></label>
-                  <span itemprop="name">
-                    <a
-                      <?php
-                      if (isset($_GET['iframe']) && intval($_GET['iframe']) == 1) {
-                        $venue_permalink = add_query_arg('venue', '1', $venue_permalink);
-                      }
-                      ?>
-                      href="<?php echo $venue_permalink ?>"><?php echo $venue; ?></a>
-                  </span>
+				  <div class="event-venue" itemprop="location" itemscope itemtype="http://schema.org/Place">
+					<?php if ($venue_post_id) { ?>
+					  <label class="ecwd-venue-info" title="<?php _e('Venue', 'event-calendar-wd'); ?>"></label>
+					  <span itemprop="name">
+						<a
+						  <?php
+						  if (isset($_GET['iframe']) && intval($_GET['iframe']) == 1) {
+							$venue_permalink = add_query_arg('venue', '1', $venue_permalink);
+						  }
+						  ?>
+						  href="<?php echo $venue_permalink ?>"><?php echo $venue; ?></a>
+					  </span>
 
-                  <?php
+					  <?php
 
-                  if (!empty($ecwd_venue_phone)) {
-                    echo sprintf($venue_meta_template, "ecwd_venue_phone", __('Phone', 'ecwd'), $ecwd_venue_phone);
-                  }
+					  if (!empty($ecwd_venue_phone)) {
+						echo sprintf($venue_meta_template, "ecwd_venue_phone", __('Phone', 'event-calendar-wd'), $ecwd_venue_phone);
+					  }
 
-                  if (!empty($ecwd_venue_website)) {
-                    echo sprintf($venue_meta_link_template, "ecwd_venue_website", __('Website', 'ecwd'), $ecwd_venue_website, $ecwd_venue_website);
-                  }
+					  if (!empty($ecwd_venue_website)) {
+						echo sprintf($venue_meta_link_template, "ecwd_venue_website", __('Website', 'event-calendar-wd'), $ecwd_venue_website, $ecwd_venue_website);
+					  }
 
-                  if (!empty($ecwd_event_location)) {
-                    ?>
-                    <div class="address" itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
-                      <span><?php _e('Address:', 'ecwd'); ?></span>
-                      <span><?php echo $ecwd_event_location; ?></span>
-                    </div>
-                    <?php
-                  }
-                  ?>
+					  if (!empty($ecwd_event_location)) {
+						?>
+						<div class="address" itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
+						  <span><?php _e('Address:', 'event-calendar-wd'); ?></span>
+						  <span><?php echo $ecwd_event_location; ?></span>
+						</div>
+						<?php
+					  }
+					  ?>
 
-                <?php } elseif ($ecwd_event_location) { ?>
-                  <span class="ecwd_hidden" itemprop="name"><?php echo $ecwd_event_location; ?></span>
-                  <label class="ecwd-venue-info"
-                         title="<?php _e('Location', 'ecwd'); ?>"></label>
-                  <span class="address" itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
-                    <?php echo $ecwd_event_location; ?>
-                  </span>
-                <?php } ?>
-              </div>
+					<?php } elseif ($ecwd_event_location) { ?>
+					  <span class="ecwd_hidden" itemprop="name"><?php echo $ecwd_event_location; ?></span>
+					  <label class="ecwd-venue-info"
+							 title="<?php _e('Location', 'event-calendar-wd'); ?>"></label>
+					  <span class="address" itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
+						<?php echo $ecwd_event_location; ?>
+					  </span>
+					<?php } ?>
+				  </div>
 
-              <?php do_action('ecwd_view_ext'); ?>
-            </div>
-          </div>
-          <?php if ($ecwd_social_icons) { ?>
+				  <?php do_action('ecwd_view_ext'); ?>
+				</div>
+			  </div>
+			  <?php if ($ecwd_social_icons) { ?>
 
-            <div class="ecwd-social">
-              <span class="share-links">
-                  <a href="http://twitter.com/home?status=<?php echo get_permalink($post_id) ?>"
-                     class="ecwd-twitter"
-                     target="_blank" data-original-title="Tweet It">
-                      <span class="visuallyhidden">Twitter</span></a>
-                  <a href="http://www.facebook.com/sharer.php?u=<?php echo get_permalink($post_id) ?>"
-                     class="ecwd-facebook"
-                     target="_blank" data-original-title="Share on Facebook">
-                      <span class="visuallyhidden">Facebook</span></a>
-                  <a href="http://plus.google.com/share?url=<?php echo get_permalink($post_id) ?>"
-                     class="ecwd-google-plus"
-                     target="_blank" data-original-title="Share on Google+">
-                      <span class="visuallyhidden">Google+</span></a>
-              </span>
-            </div>
-          <?php }
-          if ($ecwd_event_show_map == 1 && $ecwd_event_latlong) {
-            $map_events = array();
-            $map_events[0]['latlong'] = explode(',', $ecwd_event_latlong);
-            if ($ecwd_event_location != '') {
-              $map_events[0]['location'] = $ecwd_event_location;
-            }
-            $map_events[0]['zoom'] = $ecwd_event_zoom;
-            $map_events[0]['infow'] = '<div class="ecwd_map_event">';
-            $map_events[0]['infow'] .= '<span class="location">' . $ecwd_event_location . '</span>';
-            $map_events[0]['infow'] .= '</div>';
-            $map_events[0]['infow'] .= '<div class="event-detalis-date">
-        		<label class="ecwd-event-date-info" title="' . __('Date', 'ecwd') . '"></label>
-			      <span class="ecwd-event-date" itemprop="startDate" content="' . date('Y-m-d', strtotime($ecwd_event_date_from)) . 'T' . date('H:i', strtotime($ecwd_event_date_from)) . '">';
-            $map_events[0]['infow'] .= ECWD::get_ecwd_event_date_view($ecwd_event_date_from, $ecwd_event_date_to, $ecwd_all_day_event);
+				<div class="ecwd-social">
+				  <span class="share-links">
+					  <a href="https://twitter.com/home?status=<?php echo get_permalink($post_id) ?>"
+						 class="ecwd-twitter"
+						 target="_blank" data-original-title="Tweet It">
+						  <span class="visuallyhidden">Twitter</span></a>
+					  <a href="https://www.facebook.com/sharer.php?u=<?php echo get_permalink($post_id) ?>"
+						 class="ecwd-facebook"
+						 target="_blank" data-original-title="Share on Facebook">
+						  <span class="visuallyhidden">Facebook</span></a>
+					  <a href="https://plus.google.com/share?url=<?php echo get_permalink($post_id) ?>"
+						 class="ecwd-google-plus"
+						 target="_blank" data-original-title="Share on Google+">
+						  <span class="visuallyhidden">Google+</span></a>
+				  </span>
+				</div>
+			  <?php }
+			  if ($ecwd_event_show_map == 1 && $ecwd_event_latlong) {
+				$map_events = array();
+				$map_events[0]['latlong'] = explode(',', $ecwd_event_latlong);
+				if ($ecwd_event_location != '') {
+				  $map_events[0]['location'] = $ecwd_event_location;
+				}
+				$map_events[0]['zoom'] = $ecwd_event_zoom;
+				$map_events[0]['infow'] = '<div class="ecwd_map_event">';
+				$map_events[0]['infow'] .= '<span class="location">' . $ecwd_event_location . '</span>';
+				$map_events[0]['infow'] .= '</div>';
+				$map_events[0]['infow'] .= '<div class="event-detalis-date">
+					<label class="ecwd-event-date-info" title="' . __('Date', 'event-calendar-wd') . '"></label>
+					  <span class="ecwd-event-date" itemprop="startDate" content="' . date('Y-m-d', strtotime($ecwd_event_date_from)) . 'T' . date('H:i', strtotime($ecwd_event_date_from)) . '">';
+				$map_events[0]['infow'] .= ECWD::get_ecwd_event_date_view($ecwd_event_date_from, $ecwd_event_date_to, $ecwd_all_day_event);
 
-            $map_events[0]['infow'] .= '</span></div>';
-            $markers = json_encode($map_events);
-            ?>
-            <div class="ecwd-show-map">
-              <div class="ecwd_map_div"></div>
-              <textarea class="hidden ecwd_markers" style="display: none;"><?php echo $markers; ?></textarea>
-            </div>
-          <?php } ?>
-          <div class="clear"></div>
+				$map_events[0]['infow'] .= '</span></div>';
+				$markers = json_encode($map_events);
+				?>
+				<div class="ecwd-show-map">
+				  <div class="ecwd_map_div"></div>
+				  <textarea class="hidden ecwd_markers" style="display: none;"><?php echo $markers; ?></textarea>
+				</div>
+			  <?php } ?>
+			  <div class="clear"></div>
 
-          <?php if (!empty($ecwd_event_video)) { ?>
-            <div class="ecwd-event-video">
-              <?php
-              if (strpos($ecwd_event_video, 'youtube') > 0) {
-                parse_str(parse_url($ecwd_event_video, PHP_URL_QUERY), $video_array_of_vars);
-                if (isset($video_array_of_vars['v']) && $video_array_of_vars['v']) {
-                  ?>
-                  <object data="http://www.youtube.com/v/<?php echo $video_array_of_vars['v'] ?>"
-                          type="application/x-shockwave-flash" width="400" height="300">
-                    <param name="src"
-                           value="http://www.youtube.com/v/<?php echo $video_array_of_vars['v'] ?>"/>
-                  </object>
-                  <?php
-                }
-              } elseif (strpos($ecwd_event_video, 'vimeo') > 0) {
-                $videoID = explode('/', $ecwd_event_video);
-                $videoID = $videoID[count($videoID) - 1];
-                if ($videoID) { ?>
-                  <iframe
-                    src="http://player.vimeo.com/video/<?php echo $videoID; ?>?title=0&amp;byline=0&amp;portrait=0&amp;badge=0&amp;color=ffffff"
-                    width="" height="" frameborder="0" webkitAllowFullScreen mozallowfullscreen
-                    allowFullScreen></iframe>
-                  <?php
-                }
-              }
-              ?>
-            </div>
-          <?php } ?>
-          <!-- Content -->
+			  <?php if (!empty($ecwd_event_video)) { ?>
+				<div class="ecwd-event-video">
+				  <?php
+				  if (strpos($ecwd_event_video, 'youtube') > 0) {
+					parse_str(parse_url($ecwd_event_video, PHP_URL_QUERY), $video_array_of_vars);
+					if (isset($video_array_of_vars['v']) && $video_array_of_vars['v']) {
+					  ?>
+					  <object data="https://www.youtube.com/v/<?php echo $video_array_of_vars['v'] ?>"
+							  type="application/x-shockwave-flash" width="400" height="300">
+						<param name="src"
+							   value="https://www.youtube.com/v/<?php echo $video_array_of_vars['v'] ?>"/>
+					  </object>
+					  <?php
+					}
+				  } elseif (strpos($ecwd_event_video, 'vimeo') > 0) {
+					$videoID = explode('/', $ecwd_event_video);
+					$videoID = $videoID[count($videoID) - 1];
+					if ($videoID) { ?>
+					  <iframe
+						src="https://player.vimeo.com/video/<?php echo $videoID; ?>?title=0&amp;byline=0&amp;portrait=0&amp;badge=0&amp;color=ffffff"
+						width="" height="" frameborder="0" webkitAllowFullScreen mozallowfullscreen
+						allowFullScreen></iframe>
+					  <?php
+					}
+				  }
+				  ?>
+				</div>
+			  <?php } ?>
+			  <!-- Content -->
 
-          <?php
+			  <?php
+          
 
           $event_content = get_the_content();
           if (!empty($event_content)) { ?>
@@ -400,141 +401,141 @@ if ( class_exists( 'WooCommerce' ) ) {
           <?php } ?>
           <!-- End Content -->
 
+          <?php if ( ! post_password_required() ) { ?>
+			  <!-- Categories and tags -->
+			  <?php if ($category_and_tags == 1) { ?>
+				<div class="event_cageory_and_tags">
 
-          <!-- Categories and tags -->
-          <?php if ($category_and_tags == 1) { ?>
-            <div class="event_cageory_and_tags">
+				  <?php if (!empty($event_categories)) { ?>
+					<ul class="event_categories">
+					  <?php
+					  foreach ($event_categories as $category) {
+						$metas = get_option("ecwd_event_category_$category->term_id");
+						?>
+						<li class="event_category event-details-title">
+						  <?php if ($metas['color']) { ?>
+							<span class="event-metalabel" style="background:<?php echo $metas['color']; ?>"></span>
+							<span class="event_catgeory_name">
+							  <a href="<?php echo get_category_link($category); ?>"
+								 style="color:<?php echo $metas['color']; ?>">
+								<?php echo $category->name; ?>
+							  </a>
+							</span>
+						  <?php } else { ?>
+							<span class="event_catgeory_name">
+							  <a href="<?php echo get_category_link($category); ?>">
+								<?php echo $category->name; ?>
+							  </a>
+							</span>
+						  <?php } ?>
+						</li>
+					  <?php } ?>
+					</ul>
+				  <?php }
 
-              <?php if (!empty($event_categories)) { ?>
-                <ul class="event_categories">
-                  <?php
-                  foreach ($event_categories as $category) {
-                    $metas = get_option("ecwd_event_category_$category->term_id");
-                    ?>
-                    <li class="event_category event-details-title">
-                      <?php if ($metas['color']) { ?>
-                        <span class="event-metalabel" style="background:<?php echo $metas['color']; ?>"></span>
-                        <span class="event_catgeory_name">
-                          <a href="<?php echo get_category_link($category); ?>"
-                             style="color:<?php echo $metas['color']; ?>">
-                            <?php echo $category->name; ?>
-                          </a>
-                        </span>
-                      <?php } else { ?>
-                        <span class="event_catgeory_name">
-                          <a href="<?php echo get_category_link($category); ?>">
-                            <?php echo $category->name; ?>
-                          </a>
-                        </span>
-                      <?php } ?>
-                    </li>
-                  <?php } ?>
-                </ul>
-              <?php }
+				  if (!empty($event_tags)) { ?>
+					<ul class="event_tags">
+					  <?php foreach ($event_tags as $tag) { ?>
+						<li class="event_tag">
+						  <span class="event_tag_name">
+							<a href="<?php echo get_tag_link($tag); ?>">#<?php echo $tag->name; ?> </a>
+						  </span>
+						</li>
+					  <?php } ?>
+					</ul>
+				  <?php } ?>
+				</div>
+			  <?php } ?>
+			  <!--	END Categories and tags -->
+			  <?php
+			  if (!isset($ecwd_options['related_events']) || $ecwd_options['related_events'] == 1) {
+				$post_cats = wp_get_post_terms($post_id, ECWD_PLUGIN_PREFIX . '_event_category');
+				$cat_ids = wp_list_pluck($post_cats, 'term_id');
+				$post_tags = wp_get_post_terms($post_id, ECWD_PLUGIN_PREFIX . '_event_tag');
+				$tag_ids = wp_list_pluck($post_tags, 'term_id');
+				$events = array();
+				$today = date('Y-m-d');
 
-              if (!empty($event_tags)) { ?>
-                <ul class="event_tags">
-                  <?php foreach ($event_tags as $tag) { ?>
-                    <li class="event_tag">
-                      <span class="event_tag_name">
-                        <a href="<?php echo get_tag_link($tag); ?>">#<?php echo $tag->name; ?> </a>
-                      </span>
-                    </li>
-                  <?php } ?>
-                </ul>
-              <?php } ?>
-            </div>
-          <?php } ?>
-          <!--	END Categories and tags -->
-          <?php
-          if (!isset($ecwd_options['related_events']) || $ecwd_options['related_events'] == 1) {
-            $post_cats = wp_get_post_terms($post_id, ECWD_PLUGIN_PREFIX . '_event_category');
-            $cat_ids = wp_list_pluck($post_cats, 'term_id');
-            $post_tags = wp_get_post_terms($post_id, ECWD_PLUGIN_PREFIX . '_event_tag');
-            $tag_ids = wp_list_pluck($post_tags, 'term_id');
-            $events = array();
-            $today = date('Y-m-d');
+				$args = array(
+				  'numberposts' => -1,
+				  'post_type' => ECWD_PLUGIN_PREFIX . '_event',
+				  'tax_query' => array(
+					array(
+					  'taxonomy' => ECWD_PLUGIN_PREFIX . '_event_category',
+					  'terms' => $cat_ids,
+					  'field' => 'term_id',
+					)
+				  ),
+				  'orderby' => 'meta_value',
+				  'order' => 'ASC'
+				);
+				$ecwd_events_by_cats = get_posts($args);
+				$args = array(
+				  'numberposts' => -1,
+				  'post_type' => ECWD_PLUGIN_PREFIX . '_event',
+				  'tax_query' => array(
+					array(
+					  'taxonomy' => ECWD_PLUGIN_PREFIX . '_event_tag',
+					  'terms' => $tag_ids,
+					  'field' => 'term_id',
+					),
+				  ),
+				  'orderby' => 'meta_value',
+				  'order' => 'ASC'
+				);
+				$ecwd_events_by_tags = get_posts($args);
+				$ecwd_events = array_merge($ecwd_events_by_tags, $ecwd_events_by_cats);
+				$ecwd_events = array_map("unserialize", array_unique(array_map("serialize", $ecwd_events)));
+				wp_reset_postdata();
+				wp_reset_query();
 
-            $args = array(
-              'numberposts' => -1,
-              'post_type' => ECWD_PLUGIN_PREFIX . '_event',
-              'tax_query' => array(
-                array(
-                  'taxonomy' => ECWD_PLUGIN_PREFIX . '_event_category',
-                  'terms' => $cat_ids,
-                  'field' => 'term_id',
-                )
-              ),
-              'orderby' => 'meta_value',
-              'order' => 'ASC'
-            );
-            $ecwd_events_by_cats = get_posts($args);
-            $args = array(
-              'numberposts' => -1,
-              'post_type' => ECWD_PLUGIN_PREFIX . '_event',
-              'tax_query' => array(
-                array(
-                  'taxonomy' => ECWD_PLUGIN_PREFIX . '_event_tag',
-                  'terms' => $tag_ids,
-                  'field' => 'term_id',
-                ),
-              ),
-              'orderby' => 'meta_value',
-              'order' => 'ASC'
-            );
-            $ecwd_events_by_tags = get_posts($args);
-            $ecwd_events = array_merge($ecwd_events_by_tags, $ecwd_events_by_cats);
-            $ecwd_events = array_map("unserialize", array_unique(array_map("serialize", $ecwd_events)));
-            wp_reset_postdata();
-            wp_reset_query();
+				foreach ($ecwd_events as $ecwd_event) {
+				  if ($ecwd_event->ID != $post_id) {
+					$term_metas = '';
+					$categories = get_the_terms($ecwd_event->ID, ECWD_PLUGIN_PREFIX . '_event_category');
+					if (is_array($categories)) {
+					  foreach ($categories as $category) {
+						$term_metas = get_option("ecwd_event_category_$category->term_id");
+						$term_metas['id'] = $category->term_id;
+						$term_metas['name'] = $category->name;
+						$term_metas['slug'] = $category->slug;
+					  }
+					}
+					$ecwd_event_metas = get_post_meta($ecwd_event->ID, '', true);
+					$ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_url'] = array(0 => '');
+					if (!isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_location'])) {
+					  $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_location'] = array(0 => '');
+					}
+					if (!isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_lat_long'])) {
+					  $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_lat_long'] = array(0 => '');
+					}
+					if (!isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_date_to'])) {
+					  $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_date_to'] = array(0 => '');
+					}
+					if (!isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_date_from'])) {
+					  $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_date_from'] = array(0 => '');
+					}
 
-            foreach ($ecwd_events as $ecwd_event) {
-              if ($ecwd_event->ID != $post_id) {
-                $term_metas = '';
-                $categories = get_the_terms($ecwd_event->ID, ECWD_PLUGIN_PREFIX . '_event_category');
-                if (is_array($categories)) {
-                  foreach ($categories as $category) {
-                    $term_metas = get_option("ecwd_event_category_$category->term_id");
-                    $term_metas['id'] = $category->term_id;
-                    $term_metas['name'] = $category->name;
-                    $term_metas['slug'] = $category->slug;
-                  }
-                }
-                $ecwd_event_metas = get_post_meta($ecwd_event->ID, '', true);
-                $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_url'] = array(0 => '');
-                if (!isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_location'])) {
-                  $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_location'] = array(0 => '');
-                }
-                if (!isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_lat_long'])) {
-                  $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_lat_long'] = array(0 => '');
-                }
-                if (!isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_date_to'])) {
-                  $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_date_to'] = array(0 => '');
-                }
-                if (!isset($ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_date_from'])) {
-                  $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_date_from'] = array(0 => '');
-                }
+					$permalink = get_permalink($ecwd_event->ID);
+					$events[$ecwd_event->ID] = new ECWD_Event($ecwd_event->ID, 0, $ecwd_event->post_title, $ecwd_event->post_content, $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_location'][0], $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_date_from'][0], $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_date_to'][0], $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_url'][0], $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_lat_long'][0], $permalink, $ecwd_event, $term_metas, $ecwd_event_metas);
+				  }
+				}
+				$d = new ECWD_Display(0, '', '', $today);
+				$start_date = date('Y-m-d');
+				$end_date = date('Y-m-d', strtotime("+1 year", strtotime($start_date)));
+				$events = $d->get_event_days($events, 1, $start_date, $end_date);
+				?>
 
-                $permalink = get_permalink($ecwd_event->ID);
-                $events[$ecwd_event->ID] = new ECWD_Event($ecwd_event->ID, 0, $ecwd_event->post_title, $ecwd_event->post_content, $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_location'][0], $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_date_from'][0], $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_date_to'][0], $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_event_url'][0], $ecwd_event_metas[ECWD_PLUGIN_PREFIX . '_lat_long'][0], $permalink, $ecwd_event, $term_metas, $ecwd_event_metas);
-              }
-            }
-            $d = new ECWD_Display(0, '', '', $today);
-            $start_date = date('Y-m-d');
-            $end_date = date('Y-m-d', strtotime("+1 year", strtotime($start_date)));
-            $events = $d->get_event_days($events, 1, $start_date, $end_date);
-            ?>
-
-            <?php
-            $events = $d->events_unique($events);
-            do_action('ecwd_show_related_events', $events, true);
-          }
-          ?>
+				<?php
+				$events = $d->events_unique($events);
+				do_action('ecwd_show_related_events', $events, true);
+			  }
+		  }  ?>
         </div>
         <!--	#Related  Events-->
       </article>
     </div> <!-- #post-x -->
-    <?php if (comments_open() && $post->comment_status == 'open') { ?>
+    <?php if (comments_open() && $post->comment_status == 'open' && !post_password_required()) { ?>
     <div class="ecwd-comments"><?php echo comments_template(); ?></div>
   <?php } endwhile; ?>
 </div>

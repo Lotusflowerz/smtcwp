@@ -29,27 +29,27 @@ if (!$ecwd_map_zoom) {
             <div class="ecwd-venue-meta-fields">
                 <!-- start ecwd_event_location -->
                 <div class="ecwd-meta-field">
-                    <label for="ecwd_event_location">Address:</label>
+                    <label for="ecwd_event_location"><?php _e('Address','event-calendar-wd')?>:</label>
                     <input type="text" name="ecwd_venue_location" id="ecwd_event_location"
-                           value="<?php echo $ecwd_venue_location; ?>" size="70"/>
+                           value="<?php echo esc_attr($ecwd_venue_location); ?>" size="70"/>
                 </div>
                 <!-- end ecwd_event_location -->
                 <!-- start ecwd_venue_meta_phone -->
                 <div class="ecwd-meta-field">
-                    <label for="ecwd_venue_meta_phone">Phone:</label>
+                    <label for="ecwd_venue_meta_phone"><?php _e('Phone','event-calendar-wd')?>:</label>
                     <input type="text" name="ecwd_venue_meta_phone"
-                           id="ecwd_venue_meta_phone" value="<?php echo $ecwd_venue_meta_phone; ?>"/>
+                           id="ecwd_venue_meta_phone" value="<?php echo esc_attr($ecwd_venue_meta_phone); ?>"/>
                 </div>
                 <!-- end ecwd_venue_meta_phone -->
                 <!-- start ecwd_venue_meta_website -->
                 <div class="ecwd-meta-field">
-                    <label for="ecwd_venue_meta_website">Website:</label>
+                    <label for="ecwd_venue_meta_website"><?php _e('Website','event-calendar-wd')?>:</label>
                     <input type="text" name="ecwd_venue_meta_website"
-                           id="ecwd_venue_meta_website" value="<?php echo $ecwd_venue_meta_website; ?>"/>
+                           id="ecwd_venue_meta_website" value="<?php echo esc_attr($ecwd_venue_meta_website); ?>"/>
                 </div>
                 <!-- end ecwd_venue_meta_website -->
                 <div class="ecwd-meta-field">
-                    <label for="ecwd_venue_show_map">Show Google Maps:</label>
+                    <label for="ecwd_venue_show_map"><?php _e('Show Google Maps','event-calendar-wd')?>:</label>
                     <input type='checkbox' id='ecwd_venue_show_map' name='ecwd_venue_show_map' value="1"
                       <?php checked($ecwd_venue_show_map, '1'); ?>/>
                 </div>
@@ -76,12 +76,12 @@ if (!$ecwd_map_zoom) {
                         } ?>
                         <input type="hidden" name="<?php echo ECWD_PLUGIN_PREFIX; ?>_venue_lat_long"
                                id="<?php echo ECWD_PLUGIN_PREFIX; ?>_lat_long"
-                               value="<?php echo $ecwd_venue_lat_long; ?>"/>
+                               value="<?php echo esc_attr($ecwd_venue_lat_long); ?>"/>
                         <input type="hidden" name="<?php echo ECWD_PLUGIN_PREFIX; ?>_marker"
-                               id="<?php echo ECWD_PLUGIN_PREFIX; ?>_marker" value="<?php echo $ecwd_marker; ?>"/>
+                               id="<?php echo ECWD_PLUGIN_PREFIX; ?>_marker" value="<?php echo esc_attr($ecwd_marker); ?>"/>
                         <input type="hidden" name="<?php echo ECWD_PLUGIN_PREFIX; ?>_map_zoom"
                                id="<?php echo ECWD_PLUGIN_PREFIX; ?>_map_zoom"
-                               value="<?php echo $ecwd_map_zoom; ?>"/>
+                               value="<?php echo esc_attr($ecwd_map_zoom); ?>"/>
 
                         <div id="map-canvas" style="width: 100%; height: 300px; min-height: 300px;">
 
@@ -97,20 +97,20 @@ if (!$ecwd_map_zoom) {
                         }
                         ?>
                         <label style="width:85px" for="<?php echo ECWD_PLUGIN_PREFIX; ?>_latitude">Latitude:</label>
-                        <input type="text" id="<?php echo ECWD_PLUGIN_PREFIX; ?>_latitude" value="<?php echo $latitude; ?>"/>
+                        <input type="text" id="<?php echo ECWD_PLUGIN_PREFIX; ?>_latitude" value="<?php echo esc_attr($latitude); ?>"/>
                         <br/>
                         <label style="width:85px" for="<?php echo ECWD_PLUGIN_PREFIX; ?>_longitude">Longitude:</label>
-                        <input type="text" id="<?php echo ECWD_PLUGIN_PREFIX; ?>_longitude" value="<?php echo $longitude; ?>"/>
+                        <input type="text" id="<?php echo ECWD_PLUGIN_PREFIX; ?>_longitude" value="<?php echo esc_attr($longitude); ?>"/>
                     </div>
                 </div>
                 <p class="<?php echo $description_class; ?>">
-                    <?php _e('Fill in the address of the venue or click on the map to drag and drop the marker to a specific location', 'ecwd'); ?>
+                    <?php _e('Fill in the address of the venue or click on the map to drag and drop the marker to a specific location', 'event-calendar-wd'); ?>
                 </p>
             <?php } else { ?>
                 <label></label>
                 <span class="<?php echo $description_class; ?>">
-          <?php _e('You need Google Maps API key to display maps.', 'ecwd'); ?>
-                    <a href="edit.php?post_type=ecwd_event&page=ecwd_general_settings&tab=google_map">Get a key</a>
+          <?php _e('You need Google Maps API key to display maps.', 'event-calendar-wd'); ?>
+                    <a href="edit.php?post_type=ecwd_event&page=ecwd_general_settings&tab=google_map"><?php _e('Get a key','event-calendar-wd')?></a>
         </span>
             <?php } ?>
 

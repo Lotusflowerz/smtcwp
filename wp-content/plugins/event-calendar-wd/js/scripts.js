@@ -684,6 +684,9 @@ if (typeof ecwd_js_init != "function")
                     } else {
                         zoom = 2;
                     }
+
+                    var center = {lat: 0, lng: 0}
+
                     for (var i = 0; i < locations_len; i++) {
                         if (locations[i]) {
 
@@ -693,16 +696,25 @@ if (typeof ecwd_js_init != "function")
                             marker.data = locations[i].infow;
                             marker.options = new Object();
                             markers.push(marker);
+                            center.lat += parseFloat(locations[i].latlong[0]);
+                            center.lng += parseFloat(locations[i].latlong[1]);
                         }
 
                     }
+                    if(locations_len > 0) {
+                        center.lat = center.lat / locations_len;
+                        center.lng = center.lng / locations_len;
+                    }
+
                     jQuery(maps[k]).gmap3({
                         map: {
                             options: {
                                 zoom: zoom,
                                 zoomControl: true,
                                 styles: (ecwd.gmap_style !== "") ? JSON.parse(ecwd.gmap_style) : null,
-                            }
+                                center: center
+                            },
+                            center: center
                         },
                         marker: {
                             values: markers,
@@ -728,7 +740,7 @@ if (typeof ecwd_js_init != "function")
 
                             }
                         },
-                        autofit: {maxZoom: zoom}
+                        //autofit: {maxZoom: zoom}
                     });
 
                 });
