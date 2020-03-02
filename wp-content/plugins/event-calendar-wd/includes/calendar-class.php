@@ -424,7 +424,7 @@
                                                 } else {
                                                     $html .= '<img itemprop="image" src="' . $event['image'] . '" />';
                                                 }
-                                            } elseif ($image['image'] != null) {
+                  } elseif (isset($image['image'])) {
                                                 $html .= '<img itemprop="image" src="' . $image['image'] . '" />';
                                                 $event['details'] = $image['content'];
                                             }
@@ -1132,7 +1132,7 @@
                             } else {
                                 $eventcontent .= '<img itemprop="image" src="' . $cellevent['image'] . '" />';
                             }
-                        } elseif ($image['image'] != null) {
+          } elseif (isset($image['image'])) {
                             $eventcontent .= '<img itemprop="image" src="' . $image['image'] . '" />';
                             $cellevent['details'] = $image['content'];
                         }
@@ -1193,7 +1193,7 @@
                                     } else {
                                         $html .= '<img itemprop="image" src="' . $cellevent['image'] . '" />';
                                     }
-                                } elseif ($image['image'] != null) {
+              } elseif (isset($image['image'])) {
                                     $html .= '<img itemprop="image" src="' . $image['image'] . '" />';
                                     $cellevent['details'] = $image['content'];
                                 }

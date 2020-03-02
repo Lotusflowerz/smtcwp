@@ -3,7 +3,7 @@
  * Plugin Name:     Event Calendar WD
  * Plugin URI:      https://10web.io/plugins/wordpress-event-calendar/
  * Description:     Event Calendar WD is an easy event management and planning tool with advanced features.
- * Version:         1.1.33
+ * Version:         1.1.34
  * Author:          10Web
  * Author URI:      https://10web.io/plugins/
  * Text Domain:     event-calendar-wd
@@ -28,7 +28,7 @@ if(! defined( 'ECWD_URL' ) ){
 }
 
 if (!defined('ECWD_VERSION')) {
-  define('ECWD_VERSION', "1.1.33");
+  define('ECWD_VERSION', "1.1.34");
 }
 
 if (!defined('ECWD_PLUGIN_MAIN_FILE')) {

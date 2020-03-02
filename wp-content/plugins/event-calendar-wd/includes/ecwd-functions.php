@@ -274,8 +274,9 @@ function replaceFirstImages($content) {
 }
 
 function ecwd_event_popup_ajax() {
-    $ajax_start_date = isset($_POST['start_date']) ? sanitize_text_field($_POST['start_date']) : null;
-    $ajax_end_date = isset($_POST['end_date']) ? sanitize_text_field($_POST['end_date']) : null;
+    
+    $ajax_start_date = isset($_POST['start_date']) ? sanitize_title($_POST['start_date']) : null;
+    $ajax_end_date = isset($_POST['end_date']) ? sanitize_title($_POST['end_date']) : null;
 
     if (isset($_POST['id'])) {
         $post_id = sanitize_text_field(($_POST['id']));

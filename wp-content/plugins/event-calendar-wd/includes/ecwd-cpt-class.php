@@ -127,8 +127,8 @@ class ECWD_Cpt {
     }
 
     public function add_thumbnails_for_themes() {
-        global $ecwd_config;        
-        if ($ecwd_config['featured_image_for_themes']['value'] == '1') {            
+        global $ecwd_config;
+        if (isset($ecwd_config['featured_image_for_themes']['value']) && $ecwd_config['featured_image_for_themes']['value'] == '1') {
             add_theme_support('post-thumbnails', array('ecwd_calendar', 'ecwd_organizer', 'ecwd_event', 'ecwd_venue'));
         }
     }
