@@ -13,6 +13,7 @@
 	 * Hook - business_point_after_content.
 	 *
 	 * @hooked business_point_after_content_action - 10
+	 * <?php do_action( 'business_point_credit' ); ?> removed from footer
 	 */
 	do_action( 'business_point_after_content' );
 
@@ -29,7 +30,10 @@
 				</div><!-- .copyright -->
 			<?php endif; ?>
 
-			<?php do_action( 'business_point_credit' ); ?>
+			
+			
+			
+			
 			
 		</div><!-- .container -->
 	</footer><!-- #colophon -->

@@ -656,7 +656,7 @@ a:active {
 }
 
 .main-navigation ul li a {
-    color: #6e6e6e;
+    color: #0B3C5D;
     display: block;
     font-size: 14px;
     font-weight: normal;
@@ -669,7 +669,7 @@ a:active {
 
 .main-navigation ul li.current-menu-item a,
 .main-navigation ul li a:hover {
-    color:#0B3C5D;
+    color:#E3BA2E;
 }
 
 
@@ -686,7 +686,7 @@ a:active {
 }
 .main-navigation ul li.menu-item-has-children ul.sub-menu li a,
 .home.page .slider-enabled.header-collapse ul li a{
-    color: #222222;
+    /**color: #222222;**/
 }
 
 .home.page .slider-enabled.header-collapse ul li a:hover{
