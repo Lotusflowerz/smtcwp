@@ -670,6 +670,7 @@ a:active {
 .main-navigation ul li.current-menu-item a,
 .main-navigation ul li a:hover {
     color:#E3BA2E;
+	
 }
 
 
@@ -684,8 +685,11 @@ a:active {
     text-align: left;
     width: 100%;
 }
+
+
 .main-navigation ul li.menu-item-has-children ul.sub-menu li a,
 .home.page .slider-enabled.header-collapse ul li a{
+	
     /**color: #222222;**/
 }
 
@@ -701,6 +705,8 @@ a:active {
     position: absolute;
     right: 10px;
     top: 23px;
+	color: #E3BA2E;
+	
 }
 
 .main-navigation ul li li.menu-item-has-children > a::after,
