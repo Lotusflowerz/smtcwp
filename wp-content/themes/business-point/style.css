@@ -705,7 +705,7 @@ a:active {
     position: absolute;
     right: 10px;
     top: 23px;
-	color: #E3BA2E;
+	color: #0B3C5D;
 	
 }
 
@@ -713,16 +713,19 @@ a:active {
 .main-navigation ul li li.page_item_has_children > a::after {
     content: "\f105";
     top: 10px;
+	
 }
 
 .main-navigation ul li.menu-item-has-children a,
 .main-navigation ul li.page_item_has_children a {
     padding-right: 30px;
+	
 }
 
 .main-navigation .menu-toggle,
 .main-navigation .dropdown-toggle {
     display: none;
+	
 }
 #mobile-trigger {
   display: none;
