@@ -2,8 +2,8 @@
 Contributors: JoomUnited
 Tags: gutenberg, gutenberg blocks, advanced gutenberg, editor, blocks
 Requires at least: 5.0
-Tested up to: 5.3.2
-Stable tag: 2.3.5
+Tested up to: 5.4.0
+Stable tag: 2.3.6
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -140,6 +140,10 @@ The Advanced Gutenberg Custom CSS can be created from the plugin configuration a
 1. Latest posts and WooCommerce products blocks
 
 == Changelog ==
+
+= 2.3.6 =
+ * Fix : Icon block error invalid content
+ * Fix : Editor width option not working
 
 = 2.3.5 =
  * Fix : Tabs block error in version 2.3.3
