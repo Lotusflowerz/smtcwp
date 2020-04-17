@@ -3570,7 +3570,7 @@ ul.pt-team-social li:last-child {
 }
 
 /*--------------------------------------------------------------
-### Advaneced recent post widget style
+### Advanced recent post widget style
 --------------------------------------------------------------*/
 
 .business_point_widget_advanced_recent_posts .advanced-recent-posts-item {
@@ -4180,7 +4180,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00ffffff', e
 #primary .page {
     margin-bottom: 40px;
     padding: 20px;
-    border:1px solid #ddd;
+    border: none;
 }
 
 .page-template-no-border-page #primary .page {
