@@ -108,6 +108,34 @@ jQuery(document).ready( function($) {
         });
     });
 
+
+	// The "After <body> tag" option cannot go together with the "In Admin" option
+	custom_code_type_change();
+	$( 'input[name=custom_code_type]' ).on( 'change', custom_code_type_change );
+	function custom_code_type_change() {
+		if ( $( 'input[name=custom_code_type]:checked' ).val() === 'body_open' ) {
+			$( '#custom_code_side-admin' ).prop( 'disabled', true );
+			if ( $( 'input[name=custom_code_side]:checked' ).val() === 'admin' ) {
+				$( '#custom_code_side-admin' ).prop( 'checked', 'checked' );
+			}
+		} else {
+			$( '#custom_code_side-admin' ).prop( 'disabled', false );
+		}
+	}
+	custom_code_side_change();
+	$( 'input[name=custom_code_side]' ).on( 'change', custom_code_side_change );
+	function custom_code_side_change() {
+		if ( $( 'input[name=custom_code_side]:checked' ).val() === 'admin' ) {
+			$( '#custom_code_type-body_open' ).prop( 'disabled', true );
+		} else {
+			$( '#custom_code_type-body_open' ).prop( 'disabled', false );
+			if ( $( 'input[name=custom_code_type]:checked' ).val() === 'body_open' ) {
+				$( '#custom_code_type-body_open' ).prop( 'checked', true );
+			}
+		}
+	}
+
+
     // Toggle the signs for activating/deactivating codes
     function ccj_activate_deactivate(code_id, action) {
         var row = $('tr#post-'+code_id);
@@ -184,6 +212,7 @@ jQuery(document).ready( function($) {
 					code_id: $('#post_ID').val(),
 					new_slug: new_slug,
                     permalink: permalinkHref, 
+					filetype: $('#editable-post-name-full').data('filetype'), 
 					ccj_permalink_nonce: $('#ccj-permalink-nonce').val()
 				},
 				function(data) {

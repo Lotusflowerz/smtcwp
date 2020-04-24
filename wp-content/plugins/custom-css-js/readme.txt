@@ -5,7 +5,7 @@ Email: diana@burduja.eu
 Tags: CSS, JS, javascript, custom CSS, custom JS, custom style, site css, add style, customize theme, custom code, external css, css3, style, styles, stylesheet, theme, editor, design, admin
 Requires at least: 3.0.1
 Tested up to: 5.4 
-Stable tag: 3.30
+Stable tag: 3.31
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Requires PHP: 5.2.4
@@ -104,6 +104,14 @@ The URL for the linked Codes is built just like the URL for other media (from Me
 $. Add/Edit HTML 
 
 == Changelog ==
+
+
+= 3.31 =
+* 03/21/2020
+* Feature: add "After <body> tag" option for HTML codes, if the theme allows it 
+* Feature: don't show type attribute for script and style tags if the theme adds html5 support for it
+* Code refactory
+* Fix: the permalink was mistakingly showing a ".css" file extension when being edited
 
 = 3.30 =
 * 03/12/2020

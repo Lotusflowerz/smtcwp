@@ -962,6 +962,17 @@ End of comment */ ',
 
 		);
 
+		if ( function_exists( 'wp_body_open' ) ) {
+			$tmp = $options['type']['values'];
+			unset( $options['type']['values'] );
+			$options['type']['values']['header']    = $tmp['header'];
+			$options['type']['values']['body_open'] = array(
+				'title'    => __( 'After &lt;body&gt; tag', 'custom-css-js' ),
+				'dashicon' => 'editor-code',
+			);
+			$options['type']['values']['footer']    = $tmp['footer'];
+		}
+
 		return $options;
 	}
 
@@ -1338,7 +1349,7 @@ endif;
 				<strong>Permalink:</strong>
 				<span id="sample-permalink"><a href="<?php echo esc_url( $permalink ); ?>"><?php echo esc_html( CCJ_UPLOAD_URL ) . '/'; ?><span id="editable-post-name"><?php echo esc_html( $filename ); ?></span>.<?php echo esc_html( $filetype ); ?></a></span>
 				&lrm;<span id="ccj-edit-slug-buttons"><button type="button" class="ccj-edit-slug button button-small hide-if-no-js" aria-label="Edit permalink">Edit</button></span>
-				<span id="editable-post-name-full"><?php echo esc_html( $filename ); ?></span>
+				<span id="editable-post-name-full" data-filetype="<?php echo $filetype; ?>"><?php echo esc_html( $filename ); ?></span>
 			</div>
 			<?php wp_nonce_field( 'ccj-permalink', 'ccj-permalink-nonce' ); ?>
 		</div>
